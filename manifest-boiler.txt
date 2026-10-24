@@ -1,0 +1,9 @@
+version=1.01
+file=Boiler_ESP32C3_V1_01.bin
+size=1335984
+md5=70e28224adb0a2f3de7f31e1930163e1
+meter=BOILER
+oled=SH1106
+status=TEST_ONLY
+platform=ESP32-C3
+sha256=51e8d82369c4a64f8731372469ce6e0391a6b32c207e981accf5928204fe6e96
