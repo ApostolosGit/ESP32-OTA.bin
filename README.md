@@ -2,6 +2,15 @@
 
 Public hosting for ESP32-C3 Boiler firmware binaries only.
 
+## New public OTA: Boiler v1.04 (verified build, not hardware OTA-tested)
+
+- Latest application-only OTA: [Boiler_ESP32C3_V1_04.bin](./Boiler_ESP32C3_V1_04.bin), **1,343,216 bytes**. MD5: 4df6cd97ccb14cbc767b9eddb704834a. SHA256: 6869ce9286da6009f3b28847aa019fc2c40730039adfca062d433554058496ef.
+- Active [manifest-boiler.txt](./manifest-boiler.txt) version **1.04**. [Private source compilation and binary release](https://github.com/ApostolosGit/ESP32-C3-BOILER/releases/tag/boiler-merged-v1.04-test.1).
+- Updated EnergyMeter-style Network Debug, Network Setup with credential preservation, Wi-Fi/MQTT status, and confirmed OTA-ONLY Recovery/Exit. Boiler LAN static IP: **192.168.1.82**, EnergyMeter ESP8266 5.58: **.80**, Ventilation: **.81**. First-use Boiler AP: **192.168.4.1**.
+- Remains MONITOR ONLY; no relay pins are enabled. SH1106 OLED uses SDA GPIO3/SCL GPIO4; all three DS18B20 share GPIO5.
+- **OTA caution:** Firmware compiled and its bytes verified; real-device MQTT OTA and OTA recovery have NOT been tested. No automatic installation is initiated by this release. Do not flash unattended. The HTTPS OTA path currently lacks verified TLS certificates or signed image authentication; MD5 is only an integrity check.
+- Upload only the **application-only** Boiler_ESP32C3_V1_04.bin via OTA. **Never upload the 4 MB FULL MERGED file via OTA.** Merged files are for USB at offset 0x0 and overwrite LittleFS settings and history.
+
 ## First-time USB installation — FULL MERGED v1.01 (4 MB)
 
 The `Boiler_ESP32C3_V1_01.bin` in this public OTA repository is **application-only**; it must **not** be flashed at address `0x0`.
