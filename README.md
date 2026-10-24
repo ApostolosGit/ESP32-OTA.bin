@@ -2,6 +2,17 @@
 
 Public hosting for ESP32-C3 Boiler firmware binaries only.
 
+## First-time USB installation — FULL MERGED v1.01 (4 MB)
+
+The `Boiler_ESP32C3_V1_01.bin` in this public OTA repository is **application-only**; it must **not** be flashed at address `0x0`.
+
+For a first-time ESP Tool USB installation at flash address **`0x0`**, use the exact [FULL MERGED 4MB test binary from the private Boiler firmware Release](https://github.com/ApostolosGit/ESP32-C3-BOILER/releases/download/boiler-merged-v1.01-test.1/Boiler_ESP32C3_V1_01_FULL_MERGED_0x0.bin).
+
+- Merged file: `Boiler_ESP32C3_V1_01_FULL_MERGED_0x0.bin` (4,194,304 bytes).
+- SHA256: `c2e0dbd515a0eb0074d2b96a76dca644f4645d0887ae7739723895915232112e`.
+- This full image overwrites the 4MB flash, including existing settings and history. **Never use this merged file for MQTT OTA.**
+- The source Release is private, so you must be signed into GitHub with access to `ESP32-C3-BOILER` to download it.
+
 ## Published ESP32-C3 Boiler v1.01 (TEST ONLY)
 
 - Binary: [`Boiler_ESP32C3_V1_01.bin`](./Boiler_ESP32C3_V1_01.bin) (1,335,984 bytes).
