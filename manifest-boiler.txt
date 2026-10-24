@@ -1,11 +1,11 @@
-version=1.04
-file=Boiler_ESP32C3_V1_04.bin
-size=1343216
-md5=4df6cd97ccb14cbc767b9eddb704834a
+version=1.05
+file=Boiler_ESP32C3_V1_05.bin
+size=1342768
+md5=8179b77b60513629a3bb7437c139bc63
 meter=BOILER
 oled=SH1106
 status=PUBLIC_OTA
 hardware_validation=UNVERIFIED
 platform=ESP32-C3
-sha256=6869ce9286da6009f3b28847aa019fc2c40730039adfca062d433554058496ef
-release=boiler-merged-v1.04-test.1
+sha256=f209a79ff3333b2a5ea26df8704be8a2e094f1d348ca9444a922344d19b69e29
+release=boiler-merged-v1.05-test.7

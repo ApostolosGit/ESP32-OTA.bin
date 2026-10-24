@@ -2,7 +2,30 @@
 
 Public hosting for ESP32-C3 Boiler firmware binaries only.
 
-## New public OTA: Boiler v1.04 (verified build, not hardware OTA-tested)
+## Latest public Boiler OTA: v1.05 (4 independent DS18B20 sensors)
+
+- **Application-only OTA firmware:** [Boiler_ESP32C3_V1_05.bin](./Boiler_ESP32C3_V1_05.bin), **1,342,768 bytes**.
+- **Active OTA manifest:** [manifest-boiler.txt](./manifest-boiler.txt) with version=1.05.
+- **MD5:** 8179b77b60513629a3bb7437c139bc63
+- **SHA256:** f209a79ff3333b2a5ea26df8704be8a2e094f1d348ca9444a922344d19b69e29
+- Exact private [Arduino core 3.2.1 compilation and release](https://github.com/ApostolosGit/ESP32-C3-BOILER/releases/tag/boiler-merged-v1.05-test.7).
+
+The Boiler now reads **four separate DS18B20 buses**, each with its own 4.7 kΩ DQ pull-up to **3V3**:
+
+| MQTT.app | GPIO | Firmware MQTT key |
+|---|---:|---|
+| Θ1 | GPIO5 | temp_1 |
+| Θ2 | GPIO6 | temp_2 |
+| Θ3 | GPIO7 | temp_3 |
+| Θ4 | GPIO21 | temp_4 |
+
+The OLED stays on SDA GPIO3/SCL GPIO4. Boiler remains **MONITOR ONLY, with no actuator outputs**. MQTT.app v5.79 shows all four live measurements. This upgrade retains the previous two-channel LittleFS history format and existing credential record; the additional channels Θ2 and Θ4 are **live only**, not yet stored as individual historical series. Static Boiler IP remains **192.168.1.82**.
+
+**Safety:** Published for explicit user-initiated MQTT OTA after SHA256/MD5 verification and successful compilation, but **not yet hardware OTA-tested**. Do not begin an unattended upgrade without local recovery access. The remote OTA download currently does not verify a trusted TLS certificate or digital image signature; MD5 is only a checksum, not origin authentication.
+
+**Never upload the 4 MB FULL MERGED USB image over OTA.** A full-chip USB flash at 0x0 overwrites settings/history; only the 1,342,768-byte application binary is for MQTT OTA.
+
+## Historical public OTA: Boiler v1.04 (verified build, not hardware OTA-tested)
 
 - Latest application-only OTA: [Boiler_ESP32C3_V1_04.bin](./Boiler_ESP32C3_V1_04.bin), **1,343,216 bytes**. MD5: 4df6cd97ccb14cbc767b9eddb704834a. SHA256: 6869ce9286da6009f3b28847aa019fc2c40730039adfca062d433554058496ef.
 - Active [manifest-boiler.txt](./manifest-boiler.txt) version **1.04**. [Private source compilation and binary release](https://github.com/ApostolosGit/ESP32-C3-BOILER/releases/tag/boiler-merged-v1.04-test.1).
