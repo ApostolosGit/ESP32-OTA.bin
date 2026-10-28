@@ -1,0 +1,69 @@
+{
+  "application": "platform",
+  "firmware": "1.04",
+  "platform_version": "1.04",
+  "profile": "esp32c3-supermini-platform-none",
+  "driver": "NONE",
+  "oled": "NONE",
+  "sensor_drivers": [],
+  "actuators": false,
+  "core": "3.3.12",
+  "chip": "ESP32-C3",
+  "cpu_frequency_mhz": 160,
+  "usb_cdc": true,
+  "flash_address": "0x0000",
+  "flash_size": 4194304,
+  "flash_mode": "DIO",
+  "flash_frequency": "40MHz",
+  "ssid_prefix": "ESP32-C3-COMMON_C3-",
+  "setup_ip": "192.168.1.79",
+  "web_pin": "12134",
+  "wifi_authentication": "open",
+  "sta_ip": "192.168.1.XX; configurable octet2..254, default79",
+  "first_boot": "Automatic open AP at192.168.1.79; select Wi-Fi and LANIPoctet; after3failedrouterattempts returnAPwithrecordedreason",
+  "source_repository": "ApostolosGit/ESP32-C3-CommonPlatform",
+  "source_path": "ESP32-C3-supermiini-CommonPlatoform/ESP32-C3-supermiini-CommonPlatoform.ino",
+  "central_source_sha256": "1faa693289d63b1f7596e9382f1f3475086c2246d2499b1172a9153e4f9b50f5",
+  "compiled_source_sha256": "6e5b3d6285d4f357353fb0aaff429ffd0239bf13890deb9df9c2371c34c3e7b0",
+  "image": {
+    "filename": "CommonPlatform_ESP32C3_V1_04_FULL_MERGED_0x0000.bin",
+    "size": 4194304,
+    "md5": "e457271673102c4491d2b1c1b5ebe843",
+    "sha256": "76317708fdc2b309c70a9d24180da09c9579bca4b1bd5d65e454a1d5058a4b29"
+  },
+  "validation": {
+    "compile": "passed",
+    "merged_layout": "passed",
+    "headless_symbols": "passed",
+    "seven_common_host_suites": "passed",
+    "seven_boiler_compatibility_suites": "passed",
+    "hardware_v1_03_ap": "user confirmed working",
+    "hardware_v1_04": "pending"
+  },
+  "installation": "Full USB installation replaces prior credentials and history; never use as application OTA",
+  "app_ota_manifest": "not activated",
+  "static_ram_bytes": 47272,
+  "defaults": {
+    "common": 79,
+    "energymeter": 80,
+    "ventilation": 81,
+    "boiler": 82
+  },
+  "wifi_policy": {
+    "max_failed_attempts": 3,
+    "attempt_timeout_ms": 15000,
+    "retry_delay_ms": 1500,
+    "duplicate_events_count_as_attempts": false,
+    "success_resets_failures": true,
+    "fallback_ap_reason_visible": true,
+    "mqtt_failure_triggers_ap": false,
+    "ap_only": true
+  },
+  "credentials": {
+    "record_version": 2,
+    "legacy_v1_read_supported": true,
+    "ip_and_password_atomic": true,
+    "custom_ip_persists": true
+  },
+  "source_commit": "449eb626bef52a0d276c2968f344ceafac336731"
+}

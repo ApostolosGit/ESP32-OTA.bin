@@ -2,6 +2,24 @@
 
 Public hosting for ESP32-C3 application OTA and full USB installation images.
 
+## CommonPlatform v1.04 — configurable LAN IP and Wi-Fi fallback
+
+[**Download full headless CommonPlatform1.04 (4MB /0x0000)**](https://raw.githubusercontent.com/ApostolosGit/ESP32-OTA.bin/main/CommonPlatform_ESP32C3_V1_04_FULL_MERGED_0x0000.bin).
+ESP32-C3, DIO40MHz/4MB. Full flash replaces previous settings/history.
+
+Setup AP is always **192.168.1.79**, open `ESP32-C3-COMMON_C3-…`, web PIN12134.
+The setup form stores the XX of **192.168.1.XX**, range2–254; default79 for
+CommonPlatform. Application defaults are Energy80/Ventilation81/Boiler82.
+Three failed explicit router attempts reopen AP with the recorded reason.
+Each attempt has a15s deadline; successful router connection resets failures.
+MQTT failures do not trigger Wi-Fi fallback. LAN debug/setup/Recovery tools
+remain available at the chosen IP. This release contains no OLED/sensor code.
+
+[USB metadata](./CommonPlatform_ESP32C3_V1_04_USB.json) ·
+[SHA256](./CommonPlatform_ESP32C3_V1_04_USB_SHA256SUMS.txt).
+Physical1.04 validation ispending; headless1.03 AP was confirmed by the user.
+No app OTA manifest is activated or changed.
+
 ## CommonPlatform v1.03 — no OLED or sensors, AP test at 0x0000
 
 [**Download full CommonPlatform v1.03 image (4MB)**](https://raw.githubusercontent.com/ApostolosGit/ESP32-OTA.bin/main/CommonPlatform_ESP32C3_V1_03_FULL_MERGED_0x0000.bin)
