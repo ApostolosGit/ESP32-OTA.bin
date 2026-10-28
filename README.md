@@ -2,6 +2,25 @@
 
 Public hosting for ESP32-C3 application OTA and full USB installation images.
 
+## CommonPlatform v1.03 — no OLED or sensors, AP test at 0x0000
+
+[**Download full CommonPlatform v1.03 image (4MB)**](https://raw.githubusercontent.com/ApostolosGit/ESP32-OTA.bin/main/CommonPlatform_ESP32C3_V1_03_FULL_MERGED_0x0000.bin)
+
+ESP32-C3 Super Mini common platform only: **OLED_TYPE0 / no sensor drivers /
+no actuators**. Flash the full4MB image at **0x0000**, **DIO /40MHz /4MB**.
+It replaces prior credentials/history. After reset with BOOT released, join
+the open **`ESP32-C3-COMMON_C3-…`** Wi-Fi, open **http://192.168.4.1/** and use
+web PIN **12134**. First setup stays available until Wi-Fi credentials exist.
+The generic LAN address uses DHCP after setup.
+
+This reuses the exact validated genericNONE build of Common1.03, with the
+shared provisioning fixes of Boiler2.02. It excludes OLED/sensor libraries
+and is published to isolate the AP test from the Boiler application.
+Compile, image layout, headless symbols and GitHubCI passed; physical
+AP visibility remains to be tested. No application OTA manifest is activated.
+[USB metadata](./CommonPlatform_ESP32C3_V1_03_USB.json) ·
+[SHA256](./CommonPlatform_ESP32C3_V1_03_USB_SHA256SUMS.txt).
+
 ## Boiler v2.02 — keep first setup AP available, USB at 0x0000
 
 [**Download Boiler v2.02 FULL MERGED (4MB)**](https://raw.githubusercontent.com/ApostolosGit/ESP32-OTA.bin/main/Boiler_ESP32C3_V2_02_FULL_MERGED_0x0000.bin)
