@@ -1,0 +1,159 @@
+{
+  "application": "boiler",
+  "firmware": "2.04",
+  "platform_version": "1.05",
+  "profile": "esp32c3-boiler-4ds18b20-sh1106",
+  "driver": "4xDS18B20",
+  "oled": "SH1106",
+  "oled_pins": {
+    "sda": 3,
+    "scl": 4,
+    "address": "0x3C"
+  },
+  "sensor_gpio": [
+    5,
+    6,
+    7,
+    21
+  ],
+  "local_ip": "192.168.1.82",
+  "setup_ap_ip": "192.168.1.79",
+  "monitor_only": true,
+  "legacy_source_version": "1.05",
+  "legacy_source_sha256": "8c3b064cb7db4880e7bb619f588d7d275c7d2e533304fdb691dbe6ec206d1e8f",
+  "source_sha256": "209e4cf8c73ce9683274eb648659d5e83f96282d6439da66b2515a8d40d7a8ec",
+  "common_source_sha256": "f1ad53df07706471adc76c159e0e211883aeed92b42ed3a650401b249eae64a0",
+  "core": "3.3.12",
+  "flash_address": "0x0000",
+  "flash_size": 4194304,
+  "flash_mode": "DIO",
+  "flash_frequency": "40MHz",
+  "static_ram_bytes": 63232,
+  "history_channels": [
+    "TH1",
+    "TH3"
+  ],
+  "live_only_channels": [
+    "TH2",
+    "TH4"
+  ],
+  "hardware_validation": "DIAGNOSTIC_ROUTER_FIRST_TEST_PENDING",
+  "active_app_ota_manifest": "unchanged_1.05",
+  "images": {
+    "application": {
+      "filename": "Boiler_ESP32C3_V2_04.bin",
+      "size": 1480320,
+      "md5": "fcc33e7284fecda77ae48f7055b4f39e",
+      "sha256": "23a7b6890b6bb730cc93ebc4ad9c033961ccf95e619a265a739f1b2a2ef6e87d",
+      "public": false
+    },
+    "merged": {
+      "filename": "Boiler_ESP32C3_V2_04_FULL_MERGED_0x0000.bin",
+      "size": 4194304,
+      "md5": "fe7f5c5e56cabe25d6c8c674976d66ce",
+      "sha256": "1e505a891205b8747781008322f882832799b1a38916b5a3f50f70cf49d3adbb",
+      "public": true
+    }
+  },
+  "source_repository": "ApostolosGit/ESP32-C3-BOILER",
+  "source_path": "Boiler_ESP32C3_V2_04/Boiler_ESP32C3_V2_04.ino",
+  "common_repository": "ApostolosGit/ESP32-C3-CommonPlatform",
+  "image_hosting": {
+    "merged": "ESP32-OTA.bin (public USB download)",
+    "application": "ESP32-C3-BOILER/artifacts (private; not activated in app manifest)"
+  },
+  "distribution": "USB diagnostic installation; application requires router connection; app manifest unchanged",
+  "ap_startup": {
+    "ssid_prefix": "BOILER-BOILER-",
+    "ip": "192.168.1.79",
+    "channel": 1,
+    "hidden": false,
+    "authentication": "open; web PIN 12134",
+    "phy": "SDK defaults; not overridden",
+    "health_check_ms": 1000,
+    "diagnostic_snapshot_ms": 10000,
+    "startup_grace_ms": 3000,
+    "confirmed_loss_samples": 3,
+    "retry_ms": 30000,
+    "tx_power": "unchanged SDK default",
+    "startup_acceptance": "native softAP start and AP IP configuration",
+    "configuration_readback": "diagnostic only; cannot turn radio off",
+    "automatic_radio_off_on_failure": false,
+    "first_setup_boot_exit_without_credentials": false,
+    "rf_cause_proven": false,
+    "previous_device_observation": "v2.01 OLED showed setup while AP was absent or briefly visible then disappeared",
+    "physical_v2_03_test": "pending"
+  },
+  "changes": [
+    "Diagnostic router-first lifecycle opt-in on Common1.05",
+    "Inert OneWire global objects, explicit GPIO binding only during application initialization",
+    "No OLED/I2C calls before router connection; guarded display backend",
+    "Web/debug available before OLED/sensors/history initialization; peripherals not gated on presence of probes",
+    "Keep AP79, default LAN82, configurable IP and three Wi-Fi failures fallback"
+  ],
+  "working_ap_reference": {
+    "filename": "Boiler_ESP32C3_V1_01_FULL_MERGED_0x0.bin",
+    "sha256": "c2e0dbd515a0eb0074d2b96a76dca644f4645d0887ae7739723895915232112e",
+    "source_commit": "449ad39030d2aa53eb3f80291c2d48f005daf815",
+    "source_sha256": "6ade30e84bee59956c3a37dc9df4dd9f7aa626d6a2e23399eb014c055d4dab50",
+    "core": "3.2.1",
+    "flash_frequency": "80MHz",
+    "user_report": "remembered as working AP; used for behavior comparison, not copied as application"
+  },
+  "wifi_policy": {
+    "ap_ip": "192.168.1.79",
+    "sta_default_ip": "192.168.1.82",
+    "sta_octet_configurable": true,
+    "max_failed_attempts": 3,
+    "attempt_timeout_ms": 15000,
+    "retry_delay_ms": 1500,
+    "failure_reason_on_setup_page": true,
+    "mqtt_failure_triggers_ap": false,
+    "credential_record_version": 2
+  },
+  "configurable_lan_ip": "192.168.1.XX",
+  "baseline_tested_common_reference": {
+    "firmware": "1.04",
+    "label": "testedOK",
+    "requested_by_user_on": "2026-10-28",
+    "confirmation": "User requested preserving this source and binary with the testedOK filename suffix; individual hardware checks were not enumerated.",
+    "source_repository": "ApostolosGit/ESP32-C3-CommonPlatform",
+    "source_path": "releases/v1.04/ESP32-C3-supermiini-CommonPlatoform_testedOK/ESP32-C3-supermiini-CommonPlatoform_testedOK.ino",
+    "source_sha256": "6e5b3d6285d4f357353fb0aaff429ffd0239bf13890deb9df9c2371c34c3e7b0",
+    "central_source_commit": "449eb626bef52a0d276c2968f344ceafac336731",
+    "central_source_sha256": "1faa693289d63b1f7596e9382f1f3475086c2246d2499b1172a9153e4f9b50f5",
+    "binary_repository": "ApostolosGit/ESP32-OTA.bin",
+    "binary_filename": "CommonPlatform_ESP32C3_V1_04_FULL_MERGED_0x0000_testedOK.bin",
+    "binary_size": 4194304,
+    "binary_sha256": "76317708fdc2b309c70a9d24180da09c9579bca4b1bd5d65e454a1d5058a4b29",
+    "flash_address": "0x0000",
+    "flash_mode": "DIO",
+    "flash_frequency": "40MHz",
+    "flash_size": 4194304,
+    "oled": "NONE",
+    "byte_identical_to_original_release": true
+  },
+  "startup_policy": {
+    "mode": "router_first",
+    "requires_wifi_connection_before_application": true,
+    "requires_mqtt": false,
+    "peripheral_initialization_deferred": true,
+    "onewire_global_pin_binding": false,
+    "oled_during_setup": "Not initialized; may be blank or retain a previous frame",
+    "http_started_before_peripherals": true,
+    "application_paused_during_ap_or_disconnection": true,
+    "checkpoints": {
+      "11": "OLED_INIT",
+      "110": "APP_SENSOR_INIT",
+      "111": "APP_HISTORY_INIT"
+    }
+  },
+  "boot_findings": [
+    "v2.03 OneWire(pin) global constructors bound GPIO before setup",
+    "v2.03 initialized OLED, DS search and history before AP",
+    "Clean absent probes should return normally; actual RF cause is not proven",
+    "v2.04 starts platform/setup first, then application only after router IP is ready"
+  ],
+  "common_source_commit": "f4de7a872e1e86bbab0681410e31b0abb4754b99",
+  "source_commit": "18e87c33144b2a6a5b96f758f8431cbf40775490"
+}

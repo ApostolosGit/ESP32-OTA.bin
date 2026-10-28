@@ -2,6 +2,27 @@
 
 Public hosting for ESP32-C3 application OTA and full USB installation images.
 
+## Boiler v2.04 — router-first diagnostic USB test
+
+[**Download full Boiler2.04 merged BIN (4MB /0x0000)**](https://raw.githubusercontent.com/ApostolosGit/ESP32-OTA.bin/main/Boiler_ESP32C3_V2_04_FULL_MERGED_0x0000.bin).
+ESP32-C3 /DIO /40MHz /4MB; full flash replaces credentials/history.
+
+First open `BOILER-BOILER-…` AP at **192.168.1.79**, web PIN12134.
+Configure router Wi-Fi and LANoctet82. OLED, OneWire GPIO binding, sensors
+and history remain uninitialized until routerWi-Fi/IP and HTTP are ready.
+The OLED may be blank or retainanoldframe during setup. Then open
+**http://192.168.1.82/**. MQTT/internet are not startup requirements.
+Measurements pause during AP/offline operation.
+
+This diagnostic uses the new Common1.05 opt-in lifecycle, preserving the
+frozen Common1.04 testedOK. Four probes5/6/7/21 and SH1106 GPIO3/4 remain.
+Missing probes normally return no readings; their absence isnotproven tobe
+the physicalAPcause. Software ordering/display/no-probe tests passed;
+physical2.04operation remains pending. APPmanifest stays1.05.
+[Source/partitions](https://github.com/ApostolosGit/ESP32-C3-BOILER/tree/main/Boiler_ESP32C3_V2_04) ·
+[USB metadata](./Boiler_ESP32C3_V2_04_USB.json) ·
+[SHA256](./Boiler_ESP32C3_V2_04_USB_SHA256SUMS.txt).
+
 ## Boiler v2.03 — testedOK Common1.04 integration, USB test
 
 [**Download full Boiler2.03 merged BIN (4MB /0x0000)**](https://raw.githubusercontent.com/ApostolosGit/ESP32-OTA.bin/main/Boiler_ESP32C3_V2_03_FULL_MERGED_0x0000.bin).
