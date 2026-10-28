@@ -2,7 +2,36 @@
 
 Public hosting for ESP32-C3 application OTA and full USB installation images.
 
-## Boiler v2.00 — first USB installation at 0x0000
+## Boiler v2.01 — native setup AP repair, USB at 0x0000
+
+[**Download Boiler v2.01 FULL MERGED (4MB)**](https://raw.githubusercontent.com/ApostolosGit/ESP32-OTA.bin/main/Boiler_ESP32C3_V2_01_FULL_MERGED_0x0000.bin)
+for Espressif Flash Download Tool / esptool.
+
+- Chip **ESP32-C3**, address **0x0000**, **DIO / 40 MHz / 4 MB (32 Mbit)**.
+- Complete image size **4,194,304 bytes**; flashing replaces credentials/history.
+- [Source `.ino` and partitions](https://github.com/ApostolosGit/ESP32-C3-BOILER/tree/main/Boiler_ESP32C3_V2_01)
+  · [USB metadata](./Boiler_ESP32C3_V2_01_USB.json)
+  · [SHA256](./Boiler_ESP32C3_V2_01_USB_SHA256SUMS.txt).
+
+CommonPlatform **1.02** removes an unnecessary blank-AP start/stop cycle,
+selects RAM Wi-Fi storage before initialization, explicitly configures an
+open visible **channel1 / b-g-n / HT20** AP, validates native SDK state/config,
+and monitors it every second. Lost AP state invalidates the portal status
+and schedules the existing30-second retry. TX power is unchanged.
+
+A physical Boiler2.00 board reported `AP SETUP/LOCAL` on the OLED while no
+nearby client discovered its SSID. The repair addresses concrete port issues;
+**the RF cause is not proven and2.01 still needs physical AP validation**.
+SDK readback is not evidence that another device can receive beacons.
+See the [AP port audit](https://github.com/ApostolosGit/ESP32-C3-CommonPlatform/blob/main/validation/AP-PORT-AUDIT.md).
+
+On first setup join **`BOILER-BOILER-…`**, open **http://192.168.4.1/** and use
+PIN **12134**. Four independent DS18B20 inputs stay GPIO5/6/7/21, OLED is
+SH1106 on SDA3/SCL4, LAN stays **192.168.1.82**. The public Boiler app OTA
+manifest stays **1.05**; this full USB image must not be used as app OTA.
+All earlier sources, images and manifests remain available unchanged.
+
+## Boiler v2.00 — historical first USB installation at 0x0000
 
 [**Download Boiler v2.00 FULL MERGED (4MB)**](https://raw.githubusercontent.com/ApostolosGit/ESP32-OTA.bin/main/Boiler_ESP32C3_V2_00_FULL_MERGED_0x0000.bin)
 for Espressif Flash Download Tool / esptool.
@@ -28,7 +57,8 @@ Wi-Fi/MQTT again through the `BOILER-BOILER-…` AP at **192.168.4.1**, PIN12134
 
 All five firmware profiles, seven Boiler host suites, common behavior suites,
 RISC-V storage-ABI checks, desktop/mobile Chromium, and full-image layout
-validation passed. Physical board/USB/sensor operation has not yet been tested.
+validation passed at publication. Subsequent physical use reported the AP
+visibility failure described above; use2.01 for the pending repair validation.
 The public `manifest-boiler.txt` remains **1.05**: this first2.00 release is for
 USB, and does not activate app OTA. The application-only2.00 image remains
 in the private source repository. Never send this full USB image through OTA.
