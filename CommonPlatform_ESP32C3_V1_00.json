@@ -1,0 +1,39 @@
+{
+  "application": "platform",
+  "version": "1.00",
+  "platform_version": "1.00",
+  "profile": "esp32c3-supermini-platform-none",
+  "chip": "ESP32-C3",
+  "board": "Super Mini",
+  "core": "3.3.12",
+  "oled": "NONE",
+  "source_sha256": "9a6d62e8355c562908488132e7c19ec92c0cd1ce727bf5dd0eaa473135288f3a",
+  "source_upstream": "ApostolosGit/ESP8266-CommonPlatform@7c2629a2e8c7e1ba4d67228f9881141a80ca0fc3",
+  "upstream_source_sha256": "3ae8ce9fb4fa1642373b8905face9251b5a06007fb278480dccc33bf43a1a9ed",
+  "flash_address": "0x0000",
+  "flash_size": 4194304,
+  "flash_mode": "DIO",
+  "flash_frequency": "40MHz",
+  "sta_ip": "DHCP",
+  "setup_ap_ip": "192.168.4.1",
+  "tls": "ESP-IDF built-in CA bundle with certificate verification",
+  "hardware_validation": "NOT_PERFORMED",
+  "static_ram_bytes": 47216,
+  "software_validation": "passed",
+  "images": {
+    "application": {
+      "filename": "CommonPlatform_ESP32C3_V1_00_APP.bin",
+      "size": 1425184,
+      "md5": "db6313c73537a08e1d3d3d48934564ba",
+      "sha256": "a7c6f6148e2b1ef9cb0cd5fd9804b6e766db65c8557322c1c28d76ae26e7ce49"
+    },
+    "merged": {
+      "filename": "CommonPlatform_ESP32C3_V1_00_FULL_MERGED_0x0000.bin",
+      "size": 4194304,
+      "md5": "bdd057d799c083a3452d88a155695630",
+      "sha256": "3199c64b672184c4cb0a1e49068c7133afdadeb9a380bb30c384d9859a87d19b"
+    }
+  },
+  "source_repository": "ApostolosGit/ESP32-C3-CommonPlatform",
+  "source_commit": "3e7aab407e59ed76c000f96ae4812f0f66accb15"
+}

@@ -1,6 +1,40 @@
-# ESP32-C3 Boiler OTA binaries
+# ESP32-C3 firmware downloads
 
-Public hosting for ESP32-C3 Boiler firmware binaries only.
+Public hosting for ESP32-C3 application OTA and full USB installation images.
+
+## CommonPlatform v1.00 — ESP32-C3 Super Mini, USB at 0x0000
+
+[**Download the full merged 4MB binary**](https://raw.githubusercontent.com/ApostolosGit/ESP32-OTA.bin/main/CommonPlatform_ESP32C3_V1_00_FULL_MERGED_0x0000.bin)
+for **Espressif Flash Download Tool / esptool**.
+
+- File: `CommonPlatform_ESP32C3_V1_00_FULL_MERGED_0x0000.bin`.
+- Flash address **0x0000**, chip **ESP32-C3**, **DIO / 40MHz / 4MB (32Mbit)**.
+- Size **4,194,304 bytes**, SHA256
+  `3199c64b672184c4cb0a1e49068c7133afdadeb9a380bb30c384d9859a87d19b`.
+- Includes bootloader at 0x0, partition table at 0x8000, boot_app0 at 0xe000,
+  application at 0x10000 and erased remaining flash. Full USB flashing
+  replaces existing settings/history on the board.
+
+Default firmware has **no OLED**, sensors or actuator outputs. It provides
+READY/time, Wi-Fi/DHCP, MQTT with CA-verified TLS, shared web/setup/PIN,
+diagnostics and recovery services, ported from ESP8266 CommonPlatform 1.03.
+After boot, join `ESP32-C3-COMMON_C3-…`, open **http://192.168.4.1/** and use
+setup PIN **12134**. Configure Wi-Fi; the router then assigns the LAN address
+by DHCP. Optional SSD1309 support remains available in the source.
+
+[Source and instructions](https://github.com/ApostolosGit/ESP32-C3-CommonPlatform)
+· [release metadata](./CommonPlatform_ESP32C3_V1_00.json)
+· [SHA256 checksums](./CommonPlatform_ESP32C3_V1_00_SHA256SUMS.txt).
+Both display builds, all five host suites and merged-image validation passed;
+physical board/USB/Wi-Fi/OTA operation has not yet been tested.
+
+The separate [APP binary](./CommonPlatform_ESP32C3_V1_00_APP.bin),
+**1,425,184 bytes**, is for application-only OTA, **not first USB installation
+at 0x0**. Its SHA256 is
+`a7c6f6148e2b1ef9cb0cd5fd9804b6e766db65c8557322c1c28d76ae26e7ce49`.
+No CommonPlatform app OTA manifest is activated: MQTT.app currently has no
+generic platform device profile. The existing Boiler manifest and all
+previously published binaries remain unchanged.
 
 ## Latest public Boiler OTA: v1.05 (4 independent DS18B20 sensors)
 
