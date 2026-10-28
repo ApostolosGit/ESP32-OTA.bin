@@ -1,0 +1,106 @@
+{
+  "application": "boiler",
+  "firmware": "2.02",
+  "platform_version": "1.03",
+  "profile": "esp32c3-boiler-4ds18b20-sh1106",
+  "driver": "4xDS18B20",
+  "oled": "SH1106",
+  "oled_pins": {
+    "sda": 3,
+    "scl": 4,
+    "address": "0x3C"
+  },
+  "sensor_gpio": [
+    5,
+    6,
+    7,
+    21
+  ],
+  "local_ip": "192.168.1.82",
+  "setup_ap_ip": "192.168.4.1",
+  "monitor_only": true,
+  "legacy_source_version": "1.05",
+  "legacy_source_sha256": "8c3b064cb7db4880e7bb619f588d7d275c7d2e533304fdb691dbe6ec206d1e8f",
+  "source_sha256": "59ceca85caa9ab7dd26db997bff3d57dff89a87a33494409a17e02bbbcb86e94",
+  "common_source_sha256": "ab45951bc753ecbd8ae3e15b7cc176104d4c36396cad5de2fb781c66fd8b3c34",
+  "core": "3.3.12",
+  "flash_address": "0x0000",
+  "flash_size": 4194304,
+  "flash_mode": "DIO",
+  "flash_frequency": "40MHz",
+  "static_ram_bytes": 63208,
+  "history_channels": [
+    "TH1",
+    "TH3"
+  ],
+  "live_only_channels": [
+    "TH2",
+    "TH4"
+  ],
+  "hardware_validation": "AP_STABILITY_VALIDATION_PENDING",
+  "active_app_ota_manifest": "unchanged_1.05",
+  "images": {
+    "application": {
+      "filename": "Boiler_ESP32C3_V2_02.bin",
+      "size": 1476208,
+      "md5": "2e62d14a9d5774f9a72c519e7c2bf12f",
+      "sha256": "27aaa6f26747eaa511d341ce86f152d393274526652b628b193cf6e4f038be58",
+      "public": false
+    },
+    "merged": {
+      "filename": "Boiler_ESP32C3_V2_02_FULL_MERGED_0x0000.bin",
+      "size": 4194304,
+      "md5": "6b8cd219a09b7b688b3132b72b797a20",
+      "sha256": "45172906ada1a2b67471ec4bba21eb585e4c47bd76b5bda8efd33191c07db1b3",
+      "public": true
+    }
+  },
+  "source_repository": "ApostolosGit/ESP32-C3-BOILER",
+  "source_path": "Boiler_ESP32C3_V2_02/Boiler_ESP32C3_V2_02.ino",
+  "common_repository": "ApostolosGit/ESP32-C3-CommonPlatform",
+  "image_hosting": {
+    "merged": "ESP32-OTA.bin (public USB download)",
+    "application": "ESP32-C3-BOILER/artifacts (private; not activated in app manifest)"
+  },
+  "distribution": "USB installation; app manifest unchanged",
+  "ap_startup": {
+    "ssid_prefix": "BOILER-BOILER-",
+    "ip": "192.168.4.1",
+    "channel": 1,
+    "hidden": false,
+    "authentication": "open; web PIN 12134",
+    "phy": "SDK defaults; not overridden",
+    "health_check_ms": 1000,
+    "diagnostic_snapshot_ms": 10000,
+    "startup_grace_ms": 3000,
+    "confirmed_loss_samples": 3,
+    "retry_ms": 30000,
+    "tx_power": "unchanged SDK default",
+    "startup_acceptance": "native softAP start and AP IP configuration",
+    "configuration_readback": "diagnostic only; cannot turn radio off",
+    "automatic_radio_off_on_failure": false,
+    "first_setup_boot_exit_without_credentials": false,
+    "rf_cause_proven": false,
+    "previous_device_observation": "v2.01 OLED showed setup while AP was absent or briefly visible then disappeared",
+    "physical_v2_02_test": "pending"
+  },
+  "changes": [
+    "Configuration and PHY diagnostics never shut down an active AP",
+    "Accept normalized NUL-terminated SSID length zero",
+    "Require startup grace and three consecutive stopped-interface observations before retry",
+    "Retry native AP without radio OFF cycling; use SDK PHY defaults",
+    "Keep first provisioning AP open on BOOT before Wi-Fi credentials exist",
+    "Record BOOT actions and separate diagnostic snapshots from live AP state"
+  ],
+  "working_ap_reference": {
+    "filename": "Boiler_ESP32C3_V1_01_FULL_MERGED_0x0.bin",
+    "sha256": "c2e0dbd515a0eb0074d2b96a76dca644f4645d0887ae7739723895915232112e",
+    "source_commit": "449ad39030d2aa53eb3f80291c2d48f005daf815",
+    "source_sha256": "6ade30e84bee59956c3a37dc9df4dd9f7aa626d6a2e23399eb014c055d4dab50",
+    "core": "3.2.1",
+    "flash_frequency": "80MHz",
+    "user_report": "remembered as working AP; used for behavior comparison, not copied as application"
+  },
+  "common_source_commit": "1000bfaf3ff5bceb29ae17c951b5a7a7eed00f5f",
+  "source_commit": "0c09fe68dbd1a11de7762ea3212cc3eafcb9e4d9"
+}

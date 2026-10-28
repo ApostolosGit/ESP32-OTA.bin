@@ -2,7 +2,42 @@
 
 Public hosting for ESP32-C3 application OTA and full USB installation images.
 
-## Boiler v2.01 — native setup AP repair, USB at 0x0000
+## Boiler v2.02 — keep first setup AP available, USB at 0x0000
+
+[**Download Boiler v2.02 FULL MERGED (4MB)**](https://raw.githubusercontent.com/ApostolosGit/ESP32-OTA.bin/main/Boiler_ESP32C3_V2_02_FULL_MERGED_0x0000.bin)
+for Espressif Flash Download Tool / esptool.
+
+- Chip **ESP32-C3**, address **0x0000**, **DIO / 40MHz / 4MB (32Mbit)**.
+- Complete image size **4,194,304 bytes**; flashing replaces credentials/history.
+- [Source `.ino` and partitions](https://github.com/ApostolosGit/ESP32-C3-BOILER/tree/main/Boiler_ESP32C3_V2_02)
+  · [USB metadata](./Boiler_ESP32C3_V2_02_USB.json)
+  · [SHA256](./Boiler_ESP32C3_V2_02_USB_SHA256SUMS.txt).
+
+Physical Boiler2.01 testing reported that its AP appeared briefly and then
+closed. CommonPlatform **1.03** separates diagnostic config/PHY readbacks
+from AP lifecycle decisions: transient getter errors, valid ssid_len0 and
+SDK normalization no longer shut down an otherwise running AP. Health
+monitoring never forces WIFI_OFF. It requires a **3s startup grace and three
+consecutive confirmed mode/not-started losses** before revoking portal state
+and allowing a retry after30s. Plain native startup uses RAM storage, an
+open visible **channel1** SSID and AP192.168.4.1 with SDK PHY defaults.
+
+Without Wi-Fi credentials, **BOOT cannot exit first setup**. Manual AP
+toggling remains available with saved Wi-Fi credentials. The historical
+working **Boiler FULL v1.01** kept its AP during provisioning; see the
+[exact source/image reference](https://github.com/ApostolosGit/ESP32-C3-CommonPlatform/blob/main/validation/V1_01-AP-REFERENCE.md).
+The current build keeps **core3.3.12 / DIO40MHz**, rather than also changing
+to that reference's core3.2.1/DIO80MHz. TX power is unchanged.
+
+**2.02 still needs physical AP validation; the cause of the2.01 physical
+failure is not proven by source or host tests.** Join **`BOILER-BOILER-…`**,
+open **http://192.168.4.1/** and use PIN **12134** after normal boot with
+BOOT released. Four DS18B20 inputs stay GPIO5/6/7/21, SH1106 stays SDA3/SCL4,
+and LAN stays **192.168.1.82**. The public Boiler app OTA manifest remains
+**1.05**. Do not use this full USB image as application OTA. Earlier sources,
+images, manifests and validation records remain preserved.
+
+## Boiler v2.01 — historical native setup AP repair, USB at 0x0000
 
 [**Download Boiler v2.01 FULL MERGED (4MB)**](https://raw.githubusercontent.com/ApostolosGit/ESP32-OTA.bin/main/Boiler_ESP32C3_V2_01_FULL_MERGED_0x0000.bin)
 for Espressif Flash Download Tool / esptool.
@@ -20,8 +55,9 @@ and monitors it every second. Lost AP state invalidates the portal status
 and schedules the existing30-second retry. TX power is unchanged.
 
 A physical Boiler2.00 board reported `AP SETUP/LOCAL` on the OLED while no
-nearby client discovered its SSID. The repair addresses concrete port issues;
-**the RF cause is not proven and2.01 still needs physical AP validation**.
+nearby client discovered its SSID. The repair addressed concrete port issues.
+Subsequent physical testing of **2.01 failed: its AP appeared briefly and
+then closed**. The RF cause was not proven.
 SDK readback is not evidence that another device can receive beacons.
 See the [AP port audit](https://github.com/ApostolosGit/ESP32-C3-CommonPlatform/blob/main/validation/AP-PORT-AUDIT.md).
 
@@ -58,7 +94,7 @@ Wi-Fi/MQTT again through the `BOILER-BOILER-…` AP at **192.168.4.1**, PIN12134
 All five firmware profiles, seven Boiler host suites, common behavior suites,
 RISC-V storage-ABI checks, desktop/mobile Chromium, and full-image layout
 validation passed at publication. Subsequent physical use reported the AP
-visibility failure described above; use2.01 for the pending repair validation.
+visibility failure described above;2.02 is the current pending repair validation.
 The public `manifest-boiler.txt` remains **1.05**: this first2.00 release is for
 USB, and does not activate app OTA. The application-only2.00 image remains
 in the private source repository. Never send this full USB image through OTA.
