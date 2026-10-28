@@ -2,6 +2,14 @@
 
 Public hosting for ESP32-C3 application OTA and full USB installation images.
 
+## Preserved v1.04 `_testedOK` reference
+
+User-requested archive,28/10/2026: [**full4MB `_testedOK` BIN for0x0000**](https://raw.githubusercontent.com/ApostolosGit/ESP32-OTA.bin/main/CommonPlatform_ESP32C3_V1_04_FULL_MERGED_0x0000_testedOK.bin)
+and [matching compiled source](https://github.com/ApostolosGit/ESP32-C3-CommonPlatform/blob/main/releases/v1.04/ESP32-C3-supermiini-CommonPlatoform_testedOK/ESP32-C3-supermiini-CommonPlatoform_testedOK.ino).
+Byte-identical copies; original release files and manifests remain unchanged.
+[Archive metadata](./CommonPlatform_ESP32C3_V1_04_testedOK.json) ·
+[SHA256](./CommonPlatform_ESP32C3_V1_04_testedOK_SHA256SUMS.txt).
+
 ## CommonPlatform v1.04 — configurable LAN IP and Wi-Fi fallback
 
 [**Download full headless CommonPlatform1.04 (4MB /0x0000)**](https://raw.githubusercontent.com/ApostolosGit/ESP32-OTA.bin/main/CommonPlatform_ESP32C3_V1_04_FULL_MERGED_0x0000.bin).
