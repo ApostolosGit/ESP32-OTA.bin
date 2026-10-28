@@ -1,0 +1,138 @@
+{
+  "application": "boiler",
+  "firmware": "2.03",
+  "platform_version": "1.04",
+  "profile": "esp32c3-boiler-4ds18b20-sh1106",
+  "driver": "4xDS18B20",
+  "oled": "SH1106",
+  "oled_pins": {
+    "sda": 3,
+    "scl": 4,
+    "address": "0x3C"
+  },
+  "sensor_gpio": [
+    5,
+    6,
+    7,
+    21
+  ],
+  "local_ip": "192.168.1.82",
+  "setup_ap_ip": "192.168.1.79",
+  "monitor_only": true,
+  "legacy_source_version": "1.05",
+  "legacy_source_sha256": "8c3b064cb7db4880e7bb619f588d7d275c7d2e533304fdb691dbe6ec206d1e8f",
+  "source_sha256": "16e8b5bf2e212abe9aab1afb73a5874a168a64c3be679e463d7cc85631ef3599",
+  "common_source_sha256": "1faa693289d63b1f7596e9382f1f3475086c2246d2499b1172a9153e4f9b50f5",
+  "core": "3.3.12",
+  "flash_address": "0x0000",
+  "flash_size": 4194304,
+  "flash_mode": "DIO",
+  "flash_frequency": "40MHz",
+  "static_ram_bytes": 63232,
+  "history_channels": [
+    "TH1",
+    "TH3"
+  ],
+  "live_only_channels": [
+    "TH2",
+    "TH4"
+  ],
+  "hardware_validation": "BOILER_V2_03_TEST_PENDING",
+  "active_app_ota_manifest": "unchanged_1.05",
+  "images": {
+    "application": {
+      "filename": "Boiler_ESP32C3_V2_03.bin",
+      "size": 1479280,
+      "md5": "631051ed1b3e2983487271f8103e64fd",
+      "sha256": "9f870c65f51a603e95b63e6fc414f144433a1222852a3c6cbf4ac3744671d24b",
+      "public": false
+    },
+    "merged": {
+      "filename": "Boiler_ESP32C3_V2_03_FULL_MERGED_0x0000.bin",
+      "size": 4194304,
+      "md5": "b28ad54898b8de2fffb5690034f463d7",
+      "sha256": "fdb530e7315a8d8367db2eb87ce553009d44f190fb1486e27cdb9571ae8f970e",
+      "public": true
+    }
+  },
+  "source_repository": "ApostolosGit/ESP32-C3-BOILER",
+  "source_path": "Boiler_ESP32C3_V2_03/Boiler_ESP32C3_V2_03.ino",
+  "common_repository": "ApostolosGit/ESP32-C3-CommonPlatform",
+  "image_hosting": {
+    "merged": "ESP32-OTA.bin (public USB download)",
+    "application": "ESP32-C3-BOILER/artifacts (private; not activated in app manifest)"
+  },
+  "distribution": "USB test installation; app manifest unchanged",
+  "ap_startup": {
+    "ssid_prefix": "BOILER-BOILER-",
+    "ip": "192.168.1.79",
+    "channel": 1,
+    "hidden": false,
+    "authentication": "open; web PIN 12134",
+    "phy": "SDK defaults; not overridden",
+    "health_check_ms": 1000,
+    "diagnostic_snapshot_ms": 10000,
+    "startup_grace_ms": 3000,
+    "confirmed_loss_samples": 3,
+    "retry_ms": 30000,
+    "tx_power": "unchanged SDK default",
+    "startup_acceptance": "native softAP start and AP IP configuration",
+    "configuration_readback": "diagnostic only; cannot turn radio off",
+    "automatic_radio_off_on_failure": false,
+    "first_setup_boot_exit_without_credentials": false,
+    "rf_cause_proven": false,
+    "previous_device_observation": "v2.01 OLED showed setup while AP was absent or briefly visible then disappeared",
+    "physical_v2_03_test": "pending"
+  },
+  "changes": [
+    "Integrate frozen testedOK CommonPlatform1.04 without modifying the common code or Boiler measurement modules",
+    "Default Boiler LAN address192.168.1.82; persist configurable192.168.1.XX",
+    "Fixed setup AP192.168.1.79",
+    "Return to AP after3failedrouterWiFiattempts with recordedreason and existingdebug/tools",
+    "Preserve fourDS18B20 GPIO5/6/7/21, SH1106 GPIO3/4 and legacyhistory/wire formats"
+  ],
+  "working_ap_reference": {
+    "filename": "Boiler_ESP32C3_V1_01_FULL_MERGED_0x0.bin",
+    "sha256": "c2e0dbd515a0eb0074d2b96a76dca644f4645d0887ae7739723895915232112e",
+    "source_commit": "449ad39030d2aa53eb3f80291c2d48f005daf815",
+    "source_sha256": "6ade30e84bee59956c3a37dc9df4dd9f7aa626d6a2e23399eb014c055d4dab50",
+    "core": "3.2.1",
+    "flash_frequency": "80MHz",
+    "user_report": "remembered as working AP; used for behavior comparison, not copied as application"
+  },
+  "common_source_commit": "449eb626bef52a0d276c2968f344ceafac336731",
+  "tested_common_reference": {
+    "firmware": "1.04",
+    "label": "testedOK",
+    "requested_by_user_on": "2026-10-28",
+    "confirmation": "User requested preserving this source and binary with the testedOK filename suffix; individual hardware checks were not enumerated.",
+    "source_repository": "ApostolosGit/ESP32-C3-CommonPlatform",
+    "source_path": "releases/v1.04/ESP32-C3-supermiini-CommonPlatoform_testedOK/ESP32-C3-supermiini-CommonPlatoform_testedOK.ino",
+    "source_sha256": "6e5b3d6285d4f357353fb0aaff429ffd0239bf13890deb9df9c2371c34c3e7b0",
+    "central_source_commit": "449eb626bef52a0d276c2968f344ceafac336731",
+    "central_source_sha256": "1faa693289d63b1f7596e9382f1f3475086c2246d2499b1172a9153e4f9b50f5",
+    "binary_repository": "ApostolosGit/ESP32-OTA.bin",
+    "binary_filename": "CommonPlatform_ESP32C3_V1_04_FULL_MERGED_0x0000_testedOK.bin",
+    "binary_size": 4194304,
+    "binary_sha256": "76317708fdc2b309c70a9d24180da09c9579bca4b1bd5d65e454a1d5058a4b29",
+    "flash_address": "0x0000",
+    "flash_mode": "DIO",
+    "flash_frequency": "40MHz",
+    "flash_size": 4194304,
+    "oled": "NONE",
+    "byte_identical_to_original_release": true
+  },
+  "wifi_policy": {
+    "ap_ip": "192.168.1.79",
+    "sta_default_ip": "192.168.1.82",
+    "sta_octet_configurable": true,
+    "max_failed_attempts": 3,
+    "attempt_timeout_ms": 15000,
+    "retry_delay_ms": 1500,
+    "failure_reason_on_setup_page": true,
+    "mqtt_failure_triggers_ap": false,
+    "credential_record_version": 2
+  },
+  "configurable_lan_ip": "192.168.1.XX",
+  "source_commit": "4e8b0fdd7a218768025507fbf324283696a7a419"
+}

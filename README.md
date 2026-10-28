@@ -2,6 +2,25 @@
 
 Public hosting for ESP32-C3 application OTA and full USB installation images.
 
+## Boiler v2.03 — testedOK Common1.04 integration, USB test
+
+[**Download full Boiler2.03 merged BIN (4MB /0x0000)**](https://raw.githubusercontent.com/ApostolosGit/ESP32-OTA.bin/main/Boiler_ESP32C3_V2_03_FULL_MERGED_0x0000.bin).
+ESP32-C3 /DIO /40MHz /4MB. Full flash replaces prior credentials/history.
+
+The unchanged frozen CommonPlatform1.04 testedOK services are integrated
+with Boiler1.05 measurements: four separateDS18B20 buses GPIO5/6/7/21 and
+SH1106 SDA3/SCL4. SetupAP isalways **192.168.1.79**, open `BOILER-BOILER-…`,
+web PIN12134. RouterLAN defaults to **192.168.1.82**, with user-configurable
+lastoctet. Three failed Wi-Fi attempts reopen AP with the recorded reason;
+MQTTfailure isindependent. LANdebug/setup/Recovery tools are retained.
+
+[Standalone source/partitions](https://github.com/ApostolosGit/ESP32-C3-BOILER/tree/main/Boiler_ESP32C3_V2_03) ·
+[USB metadata](./Boiler_ESP32C3_V2_03_USB.json) ·
+[SHA256](./Boiler_ESP32C3_V2_03_USB_SHA256SUMS.txt).
+Compiled source, exact base provenance and full-image layout passed validation.
+Boiler2.03 hardware test ispending. The public APPmanifest stays1.05; only
+the full USB image is public. Existing testedOK/older files are preserved.
+
 ## Preserved v1.04 `_testedOK` reference
 
 User-requested archive,28/10/2026: [**full4MB `_testedOK` BIN for0x0000**](https://raw.githubusercontent.com/ApostolosGit/ESP32-OTA.bin/main/CommonPlatform_ESP32C3_V1_04_FULL_MERGED_0x0000_testedOK.bin)
