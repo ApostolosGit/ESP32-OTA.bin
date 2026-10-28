@@ -2,6 +2,38 @@
 
 Public hosting for ESP32-C3 application OTA and full USB installation images.
 
+## Boiler v2.00 — first USB installation at 0x0000
+
+[**Download Boiler v2.00 FULL MERGED (4MB)**](https://raw.githubusercontent.com/ApostolosGit/ESP32-OTA.bin/main/Boiler_ESP32C3_V2_00_FULL_MERGED_0x0000.bin)
+for Espressif Flash Download Tool / esptool.
+
+- File: `Boiler_ESP32C3_V2_00_FULL_MERGED_0x0000.bin`, **4,194,304 bytes**.
+- Chip **ESP32-C3**, address **0x0000**, **DIO / 40 MHz / 4 MB (32 Mbit)**.
+- SHA256: `247faa0218eb6a7467f4727c86c6e2bb6b0c729d0de7db2c51b007643ff55a5a`.
+- [Source `.ino` and partitions](https://github.com/ApostolosGit/ESP32-C3-BOILER/tree/main/Boiler_ESP32C3_V2_00)
+  · [USB release metadata](./Boiler_ESP32C3_V2_00_USB.json)
+  · [SHA256 file](./Boiler_ESP32C3_V2_00_USB_SHA256SUMS.txt).
+
+Boiler2.00 combines CommonPlatform1.01 with the measurements of the supplied
+1.05: four independent DS18B20 buses at GPIO5/6/7/21, async12bit sampling,
+SH1106 OLED at SDA3/SCL4, static LAN **192.168.1.82**, and monitor-only behavior.
+Existing two-channel history remains TH1/TH3; TH2/TH4 are live readings only.
+The common platform owns network/TLS, credentials, shared page/style/footer,
+clock, diagnostics, Recovery and OTA services.
+
+This complete USB image includes bootloader, partition table, OTA metadata
+and application. It **replaces existing credentials and history**. The new
+LittleFS geometry is0x330000/768KiB versus1.05's0x3D0000/128KiB. Configure
+Wi-Fi/MQTT again through the `BOILER-BOILER-…` AP at **192.168.4.1**, PIN12134.
+
+All five firmware profiles, seven Boiler host suites, common behavior suites,
+RISC-V storage-ABI checks, desktop/mobile Chromium, and full-image layout
+validation passed. Physical board/USB/sensor operation has not yet been tested.
+The public `manifest-boiler.txt` remains **1.05**: this first2.00 release is for
+USB, and does not activate app OTA. The application-only2.00 image remains
+in the private source repository. Never send this full USB image through OTA.
+All earlier Boiler/CommonPlatform files and manifests are retained unchanged.
+
 ## CommonPlatform v1.00 — ESP32-C3 Super Mini, USB at 0x0000
 
 [**Download the full merged 4MB binary**](https://raw.githubusercontent.com/ApostolosGit/ESP32-OTA.bin/main/CommonPlatform_ESP32C3_V1_00_FULL_MERGED_0x0000.bin)

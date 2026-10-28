@@ -1,0 +1,68 @@
+{
+  "application": "boiler",
+  "firmware": "2.00",
+  "platform_version": "1.01",
+  "profile": "esp32c3-boiler-4ds18b20-sh1106",
+  "driver": "4xDS18B20",
+  "oled": "SH1106",
+  "oled_pins": {
+    "sda": 3,
+    "scl": 4,
+    "address": "0x3C"
+  },
+  "sensor_gpio": [
+    5,
+    6,
+    7,
+    21
+  ],
+  "local_ip": "192.168.1.82",
+  "setup_ap_ip": "192.168.4.1",
+  "monitor_only": true,
+  "legacy_source_version": "1.05",
+  "legacy_source_sha256": "8c3b064cb7db4880e7bb619f588d7d275c7d2e533304fdb691dbe6ec206d1e8f",
+  "source_sha256": "5112e923a494e83535d676c8cbe217456abdef428e360d96005d31dd4c68494d",
+  "common_source_sha256": "b84292b48bba92ed40144caf9958bcbc419c92ec07103ec7b38cf22afe3b3a05",
+  "core": "3.3.12",
+  "flash_address": "0x0000",
+  "flash_size": 4194304,
+  "flash_mode": "DIO",
+  "flash_frequency": "40MHz",
+  "static_ram_bytes": 63176,
+  "history_channels": [
+    "TH1",
+    "TH3"
+  ],
+  "live_only_channels": [
+    "TH2",
+    "TH4"
+  ],
+  "hardware_validation": "NOT_PERFORMED",
+  "active_app_ota_manifest": "unchanged_1.05",
+  "images": {
+    "application": {
+      "filename": "Boiler_ESP32C3_V2_00.bin",
+      "size": 1472736,
+      "md5": "528f927a2287c9c73eb02fa8f0206147",
+      "sha256": "576bac67b51d975f625a42d4326bcf52efcc86a9dd61aa98359ebceb6f249887",
+      "public": false
+    },
+    "merged": {
+      "filename": "Boiler_ESP32C3_V2_00_FULL_MERGED_0x0000.bin",
+      "size": 4194304,
+      "md5": "d5536634cbcffcf1519a33e95ce516fd",
+      "sha256": "247faa0218eb6a7467f4727c86c6e2bb6b0c729d0de7db2c51b007643ff55a5a",
+      "public": true
+    }
+  },
+  "source_repository": "ApostolosGit/ESP32-C3-BOILER",
+  "source_path": "Boiler_ESP32C3_V2_00/Boiler_ESP32C3_V2_00.ino",
+  "common_repository": "ApostolosGit/ESP32-C3-CommonPlatform",
+  "image_hosting": {
+    "merged": "ESP32-OTA.bin (public USB download)",
+    "application": "ESP32-C3-BOILER/artifacts (private; not activated in app manifest)"
+  },
+  "common_source_commit": "ff99480bf51a803c04d0e4403f16de11af42e7f6",
+  "source_commit": "1b3fd98d9f7a83df0ca228b5976f6ebef96d3509",
+  "distribution": "first USB installation; app manifest unchanged"
+}
