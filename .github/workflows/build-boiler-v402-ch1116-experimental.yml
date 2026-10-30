@@ -124,19 +124,19 @@ jobs:
           manifest_path = Path('manifest-boiler-ch1116-test.txt')
           if manifest_path.exists():
               previous = manifest_path.read_text()
-              required = ('version=4.02\\n', 'oled=CH1116\\n',
-                          'profile=esp32c3-boiler-4ds18b20-ch1116\\n',
-                          'file=Boiler_ESP32C3_V4_02.bin\\n')
+              required = ('version=4.02\n', 'oled=CH1116\n',
+                          'profile=esp32c3-boiler-4ds18b20-ch1116\n',
+                          'file=Boiler_ESP32C3_V4_02.bin\n')
               if not all(marker in previous for marker in required):
                   raise SystemExit('Unexpected CH1116 test manifest; refusing overwrite')
           # Both active stable manifests must remain untouched.
           active_ssd = Path('manifest-boiler.txt').read_text()
-          if ('version=4.00\\n' not in active_ssd or
-                  'profile=esp32c3-boiler-4ds18b20-ssd1309\\n' not in active_ssd):
+          if ('version=4.00\n' not in active_ssd or
+                  'profile=esp32c3-boiler-4ds18b20-ssd1309\n' not in active_ssd):
               raise SystemExit('SSD1309 v4.00 manifest changed unexpectedly')
           active_sh = Path('manifest-boiler-sh1106.txt').read_text()
-          if ('version=4.01\\n' not in active_sh or
-                  'profile=esp32c3-boiler-4ds18b20-sh1106\\n' not in active_sh):
+          if ('version=4.01\n' not in active_sh or
+                  'profile=esp32c3-boiler-4ds18b20-sh1106\n' not in active_sh):
               raise SystemExit('SH1106 v4.01 manifest changed unexpectedly')
 
           shutil.copyfile(binary, target)
