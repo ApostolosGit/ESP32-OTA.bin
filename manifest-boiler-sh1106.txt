@@ -1,0 +1,16 @@
+version=4.01
+file=Boiler_ESP32C3_V4_01.bin
+size=1468288
+md5=2d0c4426e4b800d5faf532b48ad8bb6a
+meter=BOILER
+oled=SH1106
+application=boiler
+platform_version=1.05
+driver=4xDS18B20
+profile=esp32c3-boiler-4ds18b20-sh1106
+ota_protocol=2
+status=PUBLIC_OTA
+hardware_validation=V4_01_SH1106_NOT_HARDWARE_TESTED
+platform=ESP32-C3
+sha256=1a4fa016f14a27fb46e38a7026552bd4bcc625ca26a3e012606e64852658e862
+release=boiler-v4.01-sh1106-app-ota
