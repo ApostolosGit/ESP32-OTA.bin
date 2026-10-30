@@ -1,5 +1,13 @@
 # ESP32-C3 firmware downloads
 
+## Boiler v4.00 — application OTA (CommonPlatform v1.05)
+
+- [OTA application image](./Boiler_ESP32C3_V4_00.bin) for ESP32-C3 only.
+- [Active manifest](./manifest-boiler.txt) and [SHA256](./Boiler_ESP32C3_V4_00_SHA256SUMS.txt).
+- Shared services from CommonPlatform 1.05; four DS18B20 on GPIO5/6/7/21, SH1106 GPIO3/4.
+- OTA protocol 2 and boiler profile retained. No full-chip/USB image in this release.
+- **Hardware/OTA update has not yet been verified on a device.** Operator-confirmed update only; keep local recovery access.
+
 Public hosting for ESP32-C3 application OTA and full USB installation images.
 
 ## Boiler v2.04 — router-first diagnostic USB test
