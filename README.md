@@ -5,7 +5,7 @@
 - [OTA application image](./Boiler_ESP32C3_V4_00.bin) for ESP32-C3 only.
 - [Active manifest](./manifest-boiler.txt) and [SHA256](./Boiler_ESP32C3_V4_00_SHA256SUMS.txt).
 - Shared services from CommonPlatform 1.05; four DS18B20 on GPIO5/6/7/21, 1.54-inch SSD1309 GPIO3/4.
-- OTA protocol 2 and boiler profile retained. No full-chip/USB image in this release.
+- OTA protocol 2 retained; the build now reports the SSD1309 profile rather than SH1106. MQTT.app 5.86 supports the explicitly confirmed display migration. No full-chip/USB image in this release.
 - **Hardware/OTA update has not yet been verified on a device.** Operator-confirmed update only; keep local recovery access.
 
 ## Boiler v2.04 — router-first diagnostic USB test
