@@ -1,0 +1,201 @@
+name: Build and publish Boiler v4.02 CH1116 experimental app OTA
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/build-boiler-v402-ch1116-experimental.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: boiler-v402-ch1116-experimental
+  cancel-in-progress: false
+
+jobs:
+  firmware:
+    if: github.repository == 'ApostolosGit/ESP32-OTA.bin' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout OTA publishing repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Checkout public, pinned firmware source
+        uses: actions/checkout@v4
+        with:
+          repository: ApostolosGit/ESP32
+          ref: 0528f72986bf7d6630c7c40bd92f964dd5237cbe
+          path: firmware-source
+          persist-credentials: false
+
+      - name: Verify source, platform and target OTA identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          source = Path('firmware-source/Boiler/Boiler_ESP32C3_V4_02/Boiler_ESP32C3_V4_02.ino').read_text()
+          platform = Path('firmware-source/CommonPlatform/ESP32-C3-supermiini-CommonPlatoform.ino').read_text()
+          checks = {
+              "firmware version": '#define VERSION "4.02"',
+              "shared platform": '#define PLATFORM_VERSION "1.05"',
+              "device kind": '#define DEVICE_KIND "BOILER"',
+              "application": '#define APPLICATION_ID "boiler"',
+              "protocol": '#define OTA_PROTOCOL_VERSION 2',
+              "OLED": '#define OLED_TYPE 3',
+              "CH1116 logical identity": '#define OLED_ID "CH1116"',
+              "CH1116 profile": '#define OTA_PROFILE_ID OTA_PROFILE_PREFIX "-ch1116"',
+              "CH1116 SSD1309 driver candidate": 'U8G2_SSD1309_128X64_NONAME0_F_HW_I2C oled_;',
+              "OTA filename prefix": '#define PLATFORM_OTA_FILENAME_PREFIX "Boiler_ESP32C3_V"',
+              "OTA filename suffix": '#define PLATFORM_OTA_FILENAME_SUFFIX ".bin"',
+              "sensor pins": 'static const uint8_t btPins[4] = {5, 6, 7, 21}',
+              "profile": '#define OTA_PROFILE_PREFIX "esp32c3-boiler-4ds18b20"',
+              "target": 'CONFIG_IDF_TARGET_ESP32C3',
+              "OTA handler": 'stageRemoteHttpsOtaCommand',
+              "web": 'boilerChartsPage',
+              "sensor": 'applicationReadMeasurements'
+          }
+          for name, mark in checks.items():
+              if mark not in source:
+                  raise SystemExit('Missing firmware invariant: '+name)
+          if '#define PLATFORM_VERSION "1.05"' not in platform:
+              raise SystemExit('Unexpected CommonPlatform revision')
+          shared_markers = ('bool platformIsAllowedOtaUrl(', 'void remoteOtaFailAndRestart(',
+                            'void platformDnsComplete(', 'const uint16_t DEVICE_CREDENTIAL_VERSION = 2;')
+          for mark in shared_markers:
+              if mark not in source or mark not in platform:
+                  raise SystemExit('Missing shared platform service: '+mark)
+          if source.count('void setup()') != 1 or source.count('void loop()') != 1:
+              raise SystemExit('Unexpected sketch entrypoints')
+          print('Boiler 4.02 CH1116 experimental / CommonPlatform 1.05 checks PASSED')
+          PY
+
+      - name: Install Arduino CLI and ESP32 core
+        uses: arduino/setup-arduino-cli@v2
+        with:
+          version: "1.5.1"
+
+      - name: Install ESP32-C3 core and libraries
+        shell: bash
+        run: |
+          set -euo pipefail
+          arduino-cli config init --overwrite
+          arduino-cli config add board_manager.additional_urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
+          arduino-cli core update-index
+          arduino-cli core install esp32:esp32@3.3.12
+          arduino-cli lib update-index
+          arduino-cli lib install "PubSubClient@2.8"
+          arduino-cli lib install "U8g2"
+          arduino-cli lib install "OneWire@2.3.8"
+          arduino-cli lib install "DallasTemperature"
+
+      - name: Compile application-only ESP32-C3 binary
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build
+          arduino-cli compile \
+            --fqbn "esp32:esp32:esp32c3:CDCOnBoot=cdc,CPUFreq=160,FlashFreq=40,FlashMode=dio,FlashSize=4M,PartitionScheme=min_spiffs,DebugLevel=none" \
+            --jobs 2 \
+            --output-dir build \
+            firmware-source/Boiler/Boiler_ESP32C3_V4_02
+          test -s build/Boiler_ESP32C3_V4_02.ino.bin
+
+      - name: Check image and publish OTA manifest atomically
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib
+          import shutil
+
+          binary = Path('build/Boiler_ESP32C3_V4_02.ino.bin')
+          target = Path('Boiler_ESP32C3_V4_02.bin')
+          data = binary.read_bytes()
+          if data[0] != 0xe9 or not (100000 < len(data) < 0x1e0000):
+              raise SystemExit('Not a valid-sized ESP32-C3 OTA application binary')
+          manifest_path = Path('manifest-boiler-ch1116-test.txt')
+          if manifest_path.exists():
+              previous = manifest_path.read_text()
+              required = ('version=4.02\\n', 'oled=CH1116\\n',
+                          'profile=esp32c3-boiler-4ds18b20-ch1116\\n',
+                          'file=Boiler_ESP32C3_V4_02.bin\\n')
+              if not all(marker in previous for marker in required):
+                  raise SystemExit('Unexpected CH1116 test manifest; refusing overwrite')
+          # Both active stable manifests must remain untouched.
+          active_ssd = Path('manifest-boiler.txt').read_text()
+          if ('version=4.00\\n' not in active_ssd or
+                  'profile=esp32c3-boiler-4ds18b20-ssd1309\\n' not in active_ssd):
+              raise SystemExit('SSD1309 v4.00 manifest changed unexpectedly')
+          active_sh = Path('manifest-boiler-sh1106.txt').read_text()
+          if ('version=4.01\\n' not in active_sh or
+                  'profile=esp32c3-boiler-4ds18b20-sh1106\\n' not in active_sh):
+              raise SystemExit('SH1106 v4.01 manifest changed unexpectedly')
+
+          shutil.copyfile(binary, target)
+          md5 = hashlib.md5(data).hexdigest()
+          sha = hashlib.sha256(data).hexdigest()
+          manifest = [
+              'version=4.02',
+              'file=Boiler_ESP32C3_V4_02.bin',
+              'size='+str(len(data)),
+              'md5='+md5,
+              'meter=BOILER',
+              'oled=CH1116',
+              'application=boiler',
+              'platform_version=1.05',
+              'driver=4xDS18B20',
+              'profile=esp32c3-boiler-4ds18b20-ch1116',
+              'ota_protocol=2',
+              'status=EXPERIMENTAL_OTA',
+              'hardware_validation=V4_02_CH1116_ALT_SSD1309_INIT_NOT_HARDWARE_TESTED',
+              'platform=ESP32-C3',
+              'sha256='+sha,
+              'release=boiler-v4.02-ch1116-trial-ota',
+          ]
+          Path('manifest-boiler-ch1116-test.txt').write_text('\n'.join(manifest)+'\n')
+          Path('Boiler_ESP32C3_V4_02_SHA256SUMS.txt').write_text(sha+'  '+target.name+'\n')
+          doc = (
+              '## Boiler v4.02 — CH1116 1.3-inch experimental OTA (CommonPlatform v1.05)\n\n'
+              '- [OTA application image](./Boiler_ESP32C3_V4_02.bin) for ESP32-C3 only.\n'
+              '- [Active manifest](./manifest-boiler-ch1116-test.txt) and [SHA256](./Boiler_ESP32C3_V4_02_SHA256SUMS.txt).\n'
+              '- Shared services from CommonPlatform 1.05; four DS18B20 on GPIO5/6/7/21, 1.3-inch CH1116 using SSD1309 init GPIO3/4.\n'
+              '- OTA protocol 2 and dedicated CH1116 experimental profile using SSD1309 initialization; stable SH1106 v4.01 and SSD1309 v4.00 unchanged. TEST ONLY: not tested on a real CH1116 display. No full-chip/USB image in this release.\n'
+              '- **Hardware/OTA update has not yet been verified on a device.** Operator-confirmed update only; keep local recovery access.\n\n'
+          )
+          readme = Path('README.md').read_text()
+          if '## Boiler v4.02 — CH1116 1.3-inch experimental OTA' in readme:
+              start = readme.index('## Boiler v4.02 — CH1116 1.3-inch experimental OTA')
+              stop = readme.find('## ', start + 3)
+              if stop < 0:
+                  stop = len(readme)
+              readme = readme[:start] + doc + readme[stop:]
+          else:
+              readme = readme.replace('# ESP32-C3 firmware downloads\\n\\n', '# ESP32-C3 firmware downloads\\n\\n'+doc, 1)
+          Path('README.md').write_text(readme)
+          print('firmware',target.name,'bytes',len(data),'md5',md5,'sha256',sha)
+          PY
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Boiler_ESP32C3_V4_02.bin Boiler_ESP32C3_V4_02_SHA256SUMS.txt manifest-boiler-ch1116-test.txt README.md
+          git diff --cached --check
+          if git diff --cached --quiet; then
+            echo "v4.02 CH1116 experimental already published"
+          else
+            git commit -m "release(boiler): publish experimental v4.02 CH1116 OTA and dedicated manifest"
+            git push
+          fi
+
+      - name: Build summary
+        shell: bash
+        run: |
+          echo "Boiler v4.02 CH1116 experimental build compiled; app-only BIN and separate test manifest published." >> "$GITHUB_STEP_SUMMARY"
+          echo "Device / live OTA verification is not claimed." >> "$GITHUB_STEP_SUMMARY"
