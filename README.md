@@ -1,5 +1,11 @@
 # ESP32-C3 firmware downloads
 
+## OLED mapping update (30/10/2026)
+
+On the user's confirmed 128×64 panels: **1.54-inch → CH1116** using the U8g2 SSD1309 initialization sequence (`OLED_TYPE 3`); **1.3-inch → SSD1309** (`OLED_TYPE 2`). This reflects the tested panel models and is **not** a universal controller identification based on size alone.
+
+The released firmware BIN and manifests remain intact for OTA protocol/profile compatibility. The v4.00 SSD1309 and v4.01 SH1106 sections below retain **historical release descriptions**. The v4.02 CH1116 display initialized successfully on the user's panel, but its manifest remains experimental until full firmware/OTA verification.
+
 ## Boiler v4.01 — application OTA, OLED 1.3-inch SH1106
 
 - Firmware: [Boiler_ESP32C3_V4_01.bin](./Boiler_ESP32C3_V4_01.bin) — ESP32-C3 application-only OTA image, **not** full-chip/USB merged firmware.
