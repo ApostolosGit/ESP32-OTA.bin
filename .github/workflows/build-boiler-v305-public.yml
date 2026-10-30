@@ -1,0 +1,209 @@
+
+name: Boiler V3.05 public OTA builder
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/build-boiler-v305-public.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: boiler-v305-public-builder
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: ESP32-C3 Boiler v3.05 OTA candidate
+    if: github.repository == 'ApostolosGit/ESP32-OTA.bin' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Verify private source token
+        env:
+          SOURCE_TOKEN: ${{ secrets.BOILER_SOURCE_READ_TOKEN }}
+        run: |
+          if [ -z "$SOURCE_TOKEN" ]; then
+            echo "::error::Missing BOILER_SOURCE_READ_TOKEN"
+            exit 1
+          fi
+
+      - name: Checkout pinned private Boiler source
+        uses: actions/checkout@v4
+        with:
+          repository: ApostolosGit/ESP32-C3-BOILER
+          ref: 52b69662cbd04edc06a3986202160b9563b5795b
+          token: ${{ secrets.BOILER_SOURCE_READ_TOKEN }}
+          persist-credentials: false
+          fetch-depth: 1
+          sparse-checkout: |
+            Boiler_ESP32C3_V3_05
+          path: private-source
+
+      - name: Check firmware profile
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          sketch = Path(
+              "private-source/Boiler_ESP32C3_V3_05/"
+              "Boiler_ESP32C3_V3_05.ino"
+          )
+          source = sketch.read_text()
+
+          required = (
+              '#define VERSION "3.05"',
+              '#define PLATFORM_VERSION "1.05"',
+              '#define DEVICE_KIND "BOILER"',
+              '#define OTA_PROTOCOL_VERSION 2',
+              'static const uint8_t btPins[4] = {5, 6, 7, 21}',
+              'boilerChartsPage',
+              'boilerChartsData',
+              'handleRestartEspConfirm',
+          )
+
+          for marker in required:
+              if marker not in source:
+                  raise SystemExit(
+                      "Boiler source/profile invariant missing"
+                  )
+
+          print("Boiler v3.05 profile checks passed")
+          PY
+
+      - name: Install Arduino CLI
+        uses: arduino/setup-arduino-cli@v2
+        with:
+          version: "1.5.1"
+
+      - name: Install ESP32 core 3.3.12
+        shell: bash
+        run: |
+          set -euo pipefail
+          arduino-cli config init --overwrite
+          arduino-cli config add \
+            board_manager.additional_urls \
+            https://espressif.github.io/arduino-esp32/package_esp32_index.json
+          arduino-cli core update-index
+          arduino-cli core install esp32:esp32@3.3.12
+
+      - name: Install required libraries
+        shell: bash
+        run: |
+          set -euo pipefail
+          arduino-cli lib update-index
+          arduino-cli lib install "PubSubClient@2.8"
+          arduino-cli lib install "U8g2@2.37.0"
+          arduino-cli lib install "OneWire@2.3.8"
+          arduino-cli lib install "DallasTemperature@3.9.1"
+
+      - name: Compile ESP32-C3 application OTA binary
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build stage
+
+          if ! arduino-cli compile \
+            --fqbn "esp32:esp32:esp32c3:CDCOnBoot=cdc,CPUFreq=160,FlashFreq=40,FlashMode=dio,FlashSize=4M,PartitionScheme=min_spiffs,DebugLevel=none" \
+            --jobs 2 \
+            --output-dir build \
+            private-source/Boiler_ESP32C3_V3_05 \
+            > "$RUNNER_TEMP/boiler-compile.log" 2>&1; then
+            echo "::error::Firmware compilation failed"
+            echo "Private compiler diagnostics are not published"
+            exit 1
+          fi
+
+          cp \
+            build/Boiler_ESP32C3_V3_05.ino.bin \
+            stage/Boiler_ESP32C3_V3_05_TEST_ONLY.bin
+
+      - name: Validate binary and compute checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib
+          import json
+
+          path = Path(
+              "stage/Boiler_ESP32C3_V3_05_TEST_ONLY.bin"
+          )
+          data = path.read_bytes()
+
+          if data[:1] != b"\xe9":
+              raise SystemExit("Invalid ESP32 application header")
+
+          if not 100000 < len(data) < 1900000:
+              raise SystemExit("Unexpected OTA binary size")
+
+          source = Path(
+              "private-source/Boiler_ESP32C3_V3_05/"
+              "Boiler_ESP32C3_V3_05.ino"
+          ).read_bytes()
+
+          metadata = {
+              "version": "3.05",
+              "file": path.name,
+              "size": len(data),
+              "md5": hashlib.md5(data).hexdigest(),
+              "sha256": hashlib.sha256(data).hexdigest(),
+              "source_sha256": hashlib.sha256(
+                  source
+              ).hexdigest(),
+              "source_commit":
+                  "52b69662cbd04edc06a3986202160b9563b5795b",
+              "platform_version": "1.05",
+              "profile":
+                  "esp32c3-boiler-4ds18b20-sh1106",
+              "ota_protocol": 2,
+              "hardware_validation": "UNVERIFIED",
+              "image": "application_only"
+          }
+
+          Path("stage/ota-meta.json").write_text(
+              json.dumps(metadata, indent=2) + "\n"
+          )
+
+          print("OTA image size:", len(data))
+          print("MD5:", metadata["md5"])
+          print("SHA256:", metadata["sha256"])
+          PY
+
+          (
+            cd stage
+            md5sum Boiler_ESP32C3_V3_05_TEST_ONLY.bin \
+              > MD5SUMS.txt
+            sha256sum Boiler_ESP32C3_V3_05_TEST_ONLY.bin \
+              > SHA256SUMS.txt
+          )
+
+      - name: Publish public TEST prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          tag="boiler-v3.05-test-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+
+          gh release create "$tag" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --prerelease \
+            --title "Boiler ESP32-C3 v3.05 TEST - hardware unverified" \
+            --notes "Application-only OTA candidate. Hardware UNVERIFIED. Production manifest unchanged. No OTA command sent." \
+            stage/Boiler_ESP32C3_V3_05_TEST_ONLY.bin \
+            stage/ota-meta.json \
+            stage/MD5SUMS.txt \
+            stage/SHA256SUMS.txt
+
+          echo "Public TEST release: $tag" >> "$GITHUB_STEP_SUMMARY"
