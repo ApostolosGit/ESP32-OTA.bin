@@ -1,5 +1,13 @@
 # ESP32-C3 firmware downloads
 
+## Boiler v4.01 — application OTA, OLED 1.3-inch SH1106
+
+- Firmware: [Boiler_ESP32C3_V4_01.bin](./Boiler_ESP32C3_V4_01.bin) — ESP32-C3 application-only OTA image, **not** full-chip/USB merged firmware.
+- Manifest: [manifest-boiler-sh1106.txt](./manifest-boiler-sh1106.txt) and [SHA256](./Boiler_ESP32C3_V4_01_SHA256SUMS.txt).
+- Display: **SH1106 128×64, 1.3-inch**, `OLED_TYPE 1`, I²C SDA GPIO3 / SCL GPIO4. Four DS18B20 at GPIO5/6/7/21, CommonPlatform v1.05.
+- The MQTT.app **v5.87** routes SH1106 devices to this dedicated manifest and SSD1309 devices to the existing v4.00 manifest.
+- **Not tested on physical hardware**: operator-confirmed update only, with PIN and a local USB recovery option.
+
 ## Boiler v4.00 — application OTA (CommonPlatform v1.05)
 
 - [OTA application image](./Boiler_ESP32C3_V4_00.bin) for ESP32-C3 only.
