@@ -1,0 +1,1 @@
+61c8284577bc4f5bbede50813f3aba36963d34354cd8c40dbb21c20ff569db4f  Boiler_ESP32C3_V4_02.bin
