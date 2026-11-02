@@ -1,0 +1,1 @@
+c48601022f4ad5cc4c0456cdf2abe9d4fd5ca2c857ff1dd81d7cb5f48ebfd1cd  Boiler_ESP32C3_V4_02_FULL_MERGED_0x0000.bin
