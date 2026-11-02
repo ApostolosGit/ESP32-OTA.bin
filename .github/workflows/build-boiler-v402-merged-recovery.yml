@@ -1,0 +1,154 @@
+name: Build Boiler v4.02 ESP32-C3 merged 0x0000 recovery image
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/build-boiler-v402-merged-recovery.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: boiler-v402-merged-test
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.repository == 'ApostolosGit/ESP32-OTA.bin'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout binary publishing repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Checkout pinned Boiler v4.02 source
+        uses: actions/checkout@v4
+        with:
+          repository: ApostolosGit/ESP32
+          ref: 0528f72986bf7d6630c7c40bd92f964dd5237cbe
+          path: firmware-source
+          persist-credentials: false
+
+      - name: Verify target firmware and source provenance
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C firmware-source rev-parse HEAD)" = "0528f72986bf7d6630c7c40bd92f964dd5237cbe"
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("firmware-source/Boiler/Boiler_ESP32C3_V4_02/Boiler_ESP32C3_V4_02.ino")
+          source = p.read_text()
+          for marker in (
+              '#define VERSION "4.02"',
+              '#define PLATFORM_VERSION "1.05"',
+              '#define OLED_TYPE 3',
+              '#define OTA_PROFILE_PREFIX "esp32c3-boiler-4ds18b20"',
+              'static const uint8_t btPins[4] = {5, 6, 7, 21}',
+              'WIFI_MAX_FAILED_ATTEMPTS = 3',
+              '#define PLATFORM_SETUP_IP_TEXT "192.168.1.79"',
+              'const unsigned long WIFI_RETRY_STEPS_MS[] = {1500UL}',
+          ):
+              if marker not in source:
+                  raise SystemExit("Missing firmware invariant: " + marker)
+          if source.count("void setup()") != 1 or source.count("void loop()") != 1:
+              raise SystemExit("Unexpected sketch entrypoints")
+          print("Pinned Boiler v4.02 source confirmed")
+          PY
+
+      - name: Install Arduino CLI
+        uses: arduino/setup-arduino-cli@v2
+        with:
+          version: "1.5.1"
+
+      - name: Install ESP32 core and libraries
+        shell: bash
+        run: |
+          set -euo pipefail
+          arduino-cli config init --overwrite
+          arduino-cli config add board_manager.additional_urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
+          arduino-cli core update-index
+          arduino-cli core install esp32:esp32@3.3.12
+          arduino-cli lib update-index
+          arduino-cli lib install "PubSubClient@2.8"
+          arduino-cli lib install "U8g2"
+          arduino-cli lib install "OneWire@2.3.8"
+          arduino-cli lib install "DallasTemperature"
+          python3 -m pip install --user "esptool==4.9.0"
+
+      - name: Compile Boiler v4.02
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build
+          arduino-cli compile \
+            --fqbn "esp32:esp32:esp32c3:CDCOnBoot=cdc,CPUFreq=160,FlashFreq=40,FlashMode=dio,FlashSize=4M,PartitionScheme=min_spiffs,DebugLevel=none" \
+            --jobs 2 \
+            --output-dir build \
+            firmware-source/Boiler/Boiler_ESP32C3_V4_02
+          ls -lah build/
+
+      - name: Merge 4MB complete flash image at 0x0000 and check
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import subprocess, hashlib
+          root=Path("build")
+          def one(pattern):
+              files=list(root.glob(pattern))
+              if len(files)!=1:
+                  raise SystemExit(f"Expected one {pattern}, found {[str(x) for x in files]}")
+              return str(files[0])
+          app=one("Boiler_ESP32C3_V4_02.ino.bin")
+          boot=one("*.bootloader.bin")
+          partitions=one("*.partitions.bin")
+          ota_files=list(Path.home().glob(".arduino15/packages/esp32/hardware/esp32/3.3.12/tools/partitions/boot_app0.bin"))
+          if len(ota_files)!=1:
+              raise SystemExit("boot_app0.bin not found in installed ESP32 Arduino core")
+          image="Boiler_ESP32C3_V4_02_FULL_MERGED_0x0000.bin"
+          cmd=[
+              "python3","-m","esptool","--chip","esp32c3","merge_bin",
+              "-o",image,"--flash_mode","dio","--flash_freq","40m",
+              "--flash_size","4MB","--fill-flash-size","4MB",
+              "0x0",boot,"0x8000",partitions,"0xe000",str(ota_files[0]),
+              "0x10000",app,
+          ]
+          print("Merge command:",cmd)
+          subprocess.run(cmd,check=True)
+          data=Path(image).read_bytes()
+          if len(data)!=4194304 or data[0]!=0xe9:
+              raise SystemExit("Invalid merged full-chip image")
+          if data[0x10000]!=0xe9:
+              raise SystemExit("Missing ESP32-C3 application header at 0x10000")
+          sha=hashlib.sha256(data).hexdigest()
+          Path("Boiler_ESP32C3_V4_02_FULL_MERGED_0x0000_SHA256SUMS.txt").write_text(sha+"  "+image+"\n")
+          print(f"FULL_MERGED_OK {image} {len(data)} bytes SHA256 {sha}")
+          PY
+
+      - name: Archive merged v4.02 full binary for local USB flash
+        uses: actions/upload-artifact@v4
+        with:
+          name: Boiler_ESP32C3_V4_02_FULL_MERGED_0x0000
+          path: |
+            Boiler_ESP32C3_V4_02_FULL_MERGED_0x0000.bin
+            Boiler_ESP32C3_V4_02_FULL_MERGED_0x0000_SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Publish v4.02 full USB image without changing OTA manifests
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Boiler_ESP32C3_V4_02_FULL_MERGED_0x0000.bin Boiler_ESP32C3_V4_02_FULL_MERGED_0x0000_SHA256SUMS.txt
+          git diff --cached --check
+          if ! git diff --cached --quiet; then
+            git commit -m "release(boiler): add v4.02 full merged 0x0000 USB restore image"
+            git push
+          fi
