@@ -1,4 +1,5 @@
 name: Publish Display2.8 app-only OTA release
+# Trigger after successful ESP32 merged/app-only builds (ver0.09).
 on:
   workflow_dispatch:
   push:
