@@ -34,6 +34,13 @@ jobs:
           if [[ ! "$VERSION" =~ ^ver0\.[0-9]{2,3}$ ]]; then
             echo "Unexpected firmware version: $VERSION"; exit 1
           fi
+          # A newly edited .ino does NOT prove the app-only BIN has compiled.
+          # The matching merged snapshot must exist and equal the current merged build.
+          curl -fLsS --retry 3 --max-time 180 "$SRC/Display2.8-$VERSION.bin" -o /tmp/display28-version-merged.bin
+          curl -fLsS --retry 3 --max-time 180 "$SRC/Display2.8.bin" -o /tmp/display28-current-merged.bin
+          cmp /tmp/display28-version-merged.bin /tmp/display28-current-merged.bin || {
+            echo "Versioned and latest merged builds disagree; aborting OTA sync"; exit 1;
+          }
           TARGET="Display2.8-$VERSION-app-only.bin"
           curl -fLsS --retry 3 --max-time 180 "$SRC/Display2.8-app-only.bin" -o /tmp/display28-app.bin
           python3 - <<'PY'
@@ -46,9 +53,14 @@ jobs:
           assert magic == b'\xe9', 'not a valid ESP32 application image'
           print('Validated ESP32 application magic and size',size)
           PY
-          # Do not silently overwrite a previously archived version with new bytes.
+          # The first ver0.08 sync raced the source build and published an old
+          # application image under the new filename. Repair that specific release
+          # only after verifying that matching merged firmware has finished building.
           if [[ -e "$TARGET" ]] && ! cmp -s /tmp/display28-app.bin "$TARGET"; then
-            echo "Existing archived $TARGET differs from source - refusing overwrite"; exit 1
+            if [[ "$TARGET" != "Display2.8-ver0.08-app-only.bin" ]]; then
+              echo "Existing archive $TARGET differs; refusing overwrite"; exit 1
+            fi
+            echo "Repairing raced ver0.08 OTA archive from verified compiled build"
           fi
           cp /tmp/display28-app.bin "$TARGET"
           SIZE=$(stat -c%s "$TARGET")
