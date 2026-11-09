@@ -1,7 +1,7 @@
-version=ver0.09
-file=Display2.8-ver0.09-app-only.bin
-size=1092768
-md5=b9fd196c416de299bbd87f74308cf3d1
+version=ver0.10
+file=Display2.8-ver0.10-app-only.bin
+size=1094784
+md5=f49b8d7150cd71ce51b7774c21a9b251
 meter=DISPLAY28
 application=display28
 driver=ST7789-XPT2046
