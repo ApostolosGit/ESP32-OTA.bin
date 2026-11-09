@@ -1,0 +1,83 @@
+name: Publish Display2.8 app-only OTA release
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/sync-display28-ota.yml"
+  schedule:
+    - cron: "18 4 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: display28-ota-sync
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+      - name: Download and verify classic-ESP32 Display2.8 application image
+        shell: bash
+        run: |
+          set -euo pipefail
+          SRC="https://raw.githubusercontent.com/ApostolosGit/ESP32/main/Display2.8"
+          curl -fLsS --retry 3 --max-time 45 "$SRC/Display2.8.ino" -o /tmp/display28.ino
+          VERSION=$(sed -n 's/^#define FW_VERSION "\(ver[0-9][0-9]*\.[0-9][0-9]*\)".*/\1/p' /tmp/display28.ino | head -1)
+          if [[ ! "$VERSION" =~ ^ver0\.[0-9]{2,3}$ ]]; then
+            echo "Unexpected firmware version: $VERSION"; exit 1
+          fi
+          TARGET="Display2.8-$VERSION-app-only.bin"
+          curl -fLsS --retry 3 --max-time 180 "$SRC/Display2.8-app-only.bin" -o /tmp/display28-app.bin
+          python3 - <<'PY'
+          import os
+          p='/tmp/display28-app.bin'
+          size=os.path.getsize(p)
+          with open(p,'rb') as f:
+              magic=f.read(1)
+          assert 100000 <= size < 1500000, f"unexpected app size {size}"
+          assert magic == b'\xe9', 'not a valid ESP32 application image'
+          print('Validated ESP32 application magic and size',size)
+          PY
+          # Do not silently overwrite a previously archived version with new bytes.
+          if [[ -e "$TARGET" ]] && ! cmp -s /tmp/display28-app.bin "$TARGET"; then
+            echo "Existing archived $TARGET differs from source - refusing overwrite"; exit 1
+          fi
+          cp /tmp/display28-app.bin "$TARGET"
+          SIZE=$(stat -c%s "$TARGET")
+          MD5=$(md5sum "$TARGET" | awk '{print $1}')
+          cat > manifest-display28.txt <<EOF
+          version=$VERSION
+          file=$TARGET
+          size=$SIZE
+          md5=$MD5
+          meter=DISPLAY28
+          application=display28
+          driver=ST7789-XPT2046
+          oled=NONE
+          platform_version=1.06
+          ota_protocol=2
+          profile=esp32-display28-st7789
+          EOF
+          echo "Published $TARGET ($SIZE bytes) md5=$MD5"
+      - name: Commit verified OTA image and manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Display2.8-ver0.*-app-only.bin manifest-display28.txt
+          if git diff --cached --quiet; then
+            echo "No OTA changes to publish"
+          else
+            git commit -m "Publish validated Display2.8 OTA app and manifest"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
