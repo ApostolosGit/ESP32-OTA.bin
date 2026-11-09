@@ -1,0 +1,11 @@
+version=ver0.08
+file=Display2.8-ver0.08-app-only.bin
+size=1093520
+md5=e00463319dbf1a11956d3ecf6f4f23dc
+meter=DISPLAY28
+application=display28
+driver=ST7789-XPT2046
+oled=NONE
+platform_version=1.06
+ota_protocol=2
+profile=esp32-display28-st7789
