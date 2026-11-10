@@ -1,5 +1,5 @@
 name: Publish Display2.8 app-only OTA release
-# Publish verified Display2.8 ver0.14 OTA app and hardware manifest.
+# Publish verified Display2.8 ver0.15 OTA app and manifest after successful merged build.
 on:
   workflow_dispatch:
   push:
