@@ -1,5 +1,5 @@
 name: Publish Display2.8 app-only OTA release
-# Sync verified Display2.8 ver0.13 OTA app-only firmware (GitHub CA bundle fix).
+# Publish verified Display2.8 ver0.14 OTA app and hardware manifest.
 on:
   workflow_dispatch:
   push:
