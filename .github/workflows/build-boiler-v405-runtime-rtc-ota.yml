@@ -1,0 +1,175 @@
+name: Build and publish Boiler v4.05 SSD1309 RTC breadcrumbs OTA
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/build-boiler-v405-runtime-rtc-ota.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: boiler-v405-ssd1309-rtc-ota
+  cancel-in-progress: false
+
+jobs:
+  firmware:
+    if: github.repository == 'ApostolosGit/ESP32-OTA.bin' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout OTA publishing repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Checkout exact new Boiler source
+        uses: actions/checkout@v4
+        with:
+          repository: ApostolosGit/ESP32
+          ref: ee2c6ac2f81b144bb1cdbd0a9ee0f1292a37c4b6
+          path: firmware-source
+          persist-credentials: false
+
+      - name: Check pinned firmware identity, shared runtime events and profile
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C firmware-source rev-parse HEAD)" = "ee2c6ac2f81b144bb1cdbd0a9ee0f1292a37c4b6"
+          python3 - <<'PY'
+          from pathlib import Path
+          boiler=Path('firmware-source/Boiler/Boiler_ESP32C3_V4_05/Boiler_ESP32C3_V4_05.ino').read_text()
+          shared=Path('firmware-source/CommonPlatform/ESP32-C3-supermiini-CommonPlatoform.ino').read_text()
+          checks=[
+            '#define VERSION "4.05"', '#define PLATFORM_VERSION "1.07"',
+            '#define OLED_TYPE 2', '#define OTA_PROTOCOL_VERSION 2',
+            '#define OTA_PROFILE_ID OTA_PROFILE_PREFIX "-ssd1309"',
+            '#define OTA_PROFILE_PREFIX "esp32c3-boiler-4ds18b20"',
+            'static const uint8_t btPins[4] = {5, 6, 7, 21}',
+            'RTC_NOINIT_ATTR static volatile RuntimeBreadcrumbEntry rtcRuntimeBreadcrumbs',
+            'runtimeBreadcrumb(RB_MQTT_TLS_BEGIN)',
+            'runtimeBreadcrumb(RB_LITTLEFS_BEGIN,1)',
+            'WiFi.mode(requestedMode)', 'WIFI_AP_STA', 'WIFI_POWER_15dBm',
+          ]
+          for marker in checks:
+              if marker not in boiler:
+                  raise SystemExit('Missing Boiler invariant: '+marker)
+          for marker in ('#define PLATFORM_VERSION "1.07"',
+                         'RTC_NOINIT_ATTR static volatile RuntimeBreadcrumbEntry rtcRuntimeBreadcrumbs',
+                         'RTC runtime breadcrumb events (previous reset)'):
+              if marker not in shared:
+                  raise SystemExit('Missing Common Platform invariant: '+marker)
+          if boiler.count('void setup()')!=1 or boiler.count('void loop()')!=1:
+              raise SystemExit('Invalid Boiler entry points')
+          print('Firmware/version/profile/common-platform identity checks OK')
+          PY
+
+      - name: Install Arduino CLI
+        uses: arduino/setup-arduino-cli@v2
+        with:
+          version: "1.5.1"
+
+      - name: Install ESP32 core and libraries
+        shell: bash
+        run: |
+          set -euo pipefail
+          arduino-cli config init --overwrite
+          arduino-cli config add board_manager.additional_urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
+          arduino-cli core update-index
+          arduino-cli core install esp32:esp32@3.3.12
+          arduino-cli lib update-index
+          arduino-cli lib install "PubSubClient@2.8"
+          arduino-cli lib install "U8g2"
+          arduino-cli lib install "OneWire@2.3.8"
+          arduino-cli lib install "DallasTemperature"
+
+      - name: Compile Boiler v4.05 SSD1309 APP-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build
+          arduino-cli compile \
+            --fqbn "esp32:esp32:esp32c3:CDCOnBoot=cdc,CPUFreq=160,FlashFreq=40,FlashMode=dio,FlashSize=4M,PartitionScheme=min_spiffs,DebugLevel=none" \
+            --jobs 2 \
+            --output-dir build \
+            firmware-source/Boiler/Boiler_ESP32C3_V4_05
+          test -s build/Boiler_ESP32C3_V4_05.ino.bin
+
+      - name: Validate compiled OTA app and publish SSD1309 manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib, shutil
+          src=Path('build/Boiler_ESP32C3_V4_05.ino.bin')
+          dst=Path('Boiler_ESP32C3_V4_05.bin')
+          data=src.read_bytes()
+          if data[:1]!=b'\xe9' or not (100000<len(data)<0x1e0000):
+              raise SystemExit('Invalid ESP32-C3 APP-only image / OTA slot size')
+          old=Path('manifest-boiler.txt').read_text()
+          if ('oled=SSD1309\n' not in old or
+              'profile=esp32c3-boiler-4ds18b20-ssd1309\n' not in old or
+              'application=boiler\n' not in old or
+              'ota_protocol=2\n' not in old):
+              raise SystemExit('Live SSD1309 manifest unexpectedly changed')
+          if not old.startswith(('version=4.00\n', 'version=4.05\n')):
+              raise SystemExit('Live manifest changed: refusing overwrite')
+          shutil.copyfile(src,dst)
+          md5=hashlib.md5(data).hexdigest()
+          sha=hashlib.sha256(data).hexdigest()
+          manifest=[
+             'version=4.05', 'file='+dst.name, 'size='+str(len(data)),
+             'md5='+md5, 'meter=BOILER', 'oled=SSD1309',
+             'application=boiler', 'platform_version=1.07',
+             'driver=4xDS18B20', 'profile=esp32c3-boiler-4ds18b20-ssd1309',
+             'ota_protocol=2', 'status=PUBLIC_OTA',
+             'hardware_validation=V4_05_RTC_BREADCRUMBS_COMPILED_NOT_HARDWARE_TESTED',
+             'platform=ESP32-C3', 'sha256='+sha,
+             'release=boiler-v4.05-ssd1309-rtc-runtime-breadcrumbs-app-ota'
+          ]
+          Path('manifest-boiler.txt').write_text('\n'.join(manifest)+'\n')
+          Path('Boiler_ESP32C3_V4_05_SHA256SUMS.txt').write_text(sha+'  '+dst.name+'\n')
+          readme=Path('README.md').read_text()
+          new_section=(
+              '## Boiler v4.05 — SSD1309 1.3-inch APP OTA / Common Platform v1.07\n\n'
+              '- [OTA application image](./Boiler_ESP32C3_V4_05.bin) (flash offset 0x10000, not a full USB merged image).\n'
+              '- [Active SSD1309 manifest](./manifest-boiler.txt) and [SHA256](./Boiler_ESP32C3_V4_05_SHA256SUMS.txt).\n'
+              '- RTC-only runtime breadcrumbs (last 12 events, checksums) appear in OTA-only Recovery and Network Debug after reset.\n'
+              '- ESP32-C3, 1.3-inch SSD1309, four DS18B20 GPIO5/6/7/21, OTA protocol 2.\n'
+              '- **Build-verified only: runtime/hardware recovery behavior NOT YET VERIFIED.** Keep USB/IDE OTA recovery available.\n'
+              '- Existing v4.04 in OTA-only Recovery cannot receive the normal MQTT-app OTA command; use IDE OTA or exit Recovery with caution.\n\n'
+          )
+          if '## Boiler v4.05 — SSD1309 1.3-inch APP OTA' not in readme:
+              readme=readme.replace('# ESP32-C3 firmware downloads\n\n',
+                  '# ESP32-C3 firmware downloads\n\n'+new_section,1)
+          Path('README.md').write_text(readme)
+          print('PUBLISH:',dst.name,'size=',len(data),'sha256=',sha)
+          PY
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Boiler_ESP32C3_V4_05.bin Boiler_ESP32C3_V4_05_SHA256SUMS.txt manifest-boiler.txt README.md
+          git diff --cached --check
+          if ! git diff --cached --quiet; then
+            git commit -m "release(boiler): publish v4.05 SSD1309 RTC breadcrumbs APP OTA"
+            git push
+          fi
+
+      - name: Archive exact compiled application
+        uses: actions/upload-artifact@v4
+        with:
+          name: Boiler_v405_SSD1309_1p3_APP_OTA
+          path: |
+            Boiler_ESP32C3_V4_05.bin
+            Boiler_ESP32C3_V4_05_SHA256SUMS.txt
+            manifest-boiler.txt
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Summary
+        shell: bash
+        run: |
+          echo "ESP32-C3 Boiler v4.05 SSD1309 app OTA compiled and published, hardware test pending." >> "$GITHUB_STEP_SUMMARY"
