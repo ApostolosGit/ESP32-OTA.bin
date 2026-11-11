@@ -1,5 +1,14 @@
 # ESP32-C3 firmware downloads
 
+## Boiler v4.05 — SSD1309 1.3-inch APP OTA / Common Platform v1.07
+
+- [OTA application image](./Boiler_ESP32C3_V4_05.bin) (flash offset 0x10000, not a full USB merged image).
+- [Active SSD1309 manifest](./manifest-boiler.txt) and [SHA256](./Boiler_ESP32C3_V4_05_SHA256SUMS.txt).
+- RTC-only runtime breadcrumbs (last 12 events, checksums) appear in OTA-only Recovery and Network Debug after reset.
+- ESP32-C3, 1.3-inch SSD1309, four DS18B20 GPIO5/6/7/21, OTA protocol 2.
+- **Build-verified only: runtime/hardware recovery behavior NOT YET VERIFIED.** Keep USB/IDE OTA recovery available.
+- Existing v4.04 in OTA-only Recovery cannot receive the normal MQTT-app OTA command; use IDE OTA or exit Recovery with caution.
+
 ## OLED mapping update (30/10/2026)
 
 On the user's confirmed 128×64 panels: **1.54-inch → CH1116** using the U8g2 SSD1309 initialization sequence (`OLED_TYPE 3`); **1.3-inch → SSD1309** (`OLED_TYPE 2`). This reflects the tested panel models and is **not** a universal controller identification based on size alone.
