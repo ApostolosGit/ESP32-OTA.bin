@@ -29,7 +29,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: ApostolosGit/ESP32
-          ref: ee2c6ac2f81b144bb1cdbd0a9ee0f1292a37c4b6
+          ref: 6e48f26eb06be80e1262dbf11f9c1d4d37d35cf9
           path: firmware-source
           persist-credentials: false
 
@@ -37,7 +37,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git -C firmware-source rev-parse HEAD)" = "ee2c6ac2f81b144bb1cdbd0a9ee0f1292a37c4b6"
+          test "$(git -C firmware-source rev-parse HEAD)" = "6e48f26eb06be80e1262dbf11f9c1d4d37d35cf9"
           python3 - <<'PY'
           from pathlib import Path
           boiler=Path('firmware-source/Boiler/Boiler_ESP32C3_V4_05/Boiler_ESP32C3_V4_05.ino').read_text()
