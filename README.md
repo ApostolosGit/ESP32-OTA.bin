@@ -1,5 +1,14 @@
 # ESP32-C3 firmware downloads
 
+## Boiler v4.06 — SSD1309 1.3-inch APP OTA / Common Platform v1.08
+
+- [OTA application image](./Boiler_ESP32C3_V4_06.bin) (flash offset 0x10000, not a full USB merged image).
+- [Active SSD1309 manifest](./manifest-boiler.txt) and [SHA256](./Boiler_ESP32C3_V4_06_SHA256SUMS.txt).
+- Sampled RTC Web active phase (pass 1/2/Recovery), socket subphase and HTTP handler trace in Recovery Debug after watchdog.
+- ESP32-C3, 1.3-inch SSD1309, four DS18B20 GPIO5/6/7/21, OTA protocol 2.
+- **Build-verified only: runtime/hardware recovery behavior NOT YET VERIFIED.** Keep USB/IDE OTA recovery available.
+- Existing v4.04 in OTA-only Recovery cannot receive the normal MQTT-app OTA command; use IDE OTA or exit Recovery with caution.
+
 ## Boiler v4.05 — SSD1309 1.3-inch APP OTA / Common Platform v1.07
 
 - [OTA application image](./Boiler_ESP32C3_V4_05.bin) (flash offset 0x10000, not a full USB merged image).
